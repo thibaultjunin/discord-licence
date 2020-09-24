@@ -1,7 +1,7 @@
 'use strict';
 const {Permissions, MessageEmbed} = require('discord.js');
 
-module.exports = class RolePicker{
+module.exports = class Message{
     static load(client){
 
         client.on('message', (message) => {
