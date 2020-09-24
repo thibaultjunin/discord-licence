@@ -1,0 +1,4 @@
+node_modules
+.env
+test_crosspost_discord.js
+package-lock.json

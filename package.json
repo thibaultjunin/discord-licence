@@ -1,0 +1,20 @@
+{
+  "name": "discord_bot_uca",
+  "version": "1.0.0",
+  "description": "Bot discord pour la gestion du serveur informatique",
+  "main": "uca.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "discord.js": "^12.3.1",
+    "dom-parser": "^0.1.6",
+    "mysql": "^2.18.1",
+    "node-env-file": "^0.1.8",
+    "nodemailer": "^6.4.11",
+    "uuid": "^8.3.0"
+  }
+}
