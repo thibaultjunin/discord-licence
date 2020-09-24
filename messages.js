@@ -1,15 +1,17 @@
 'use strict';
 const {Permissions, MessageEmbed} = require('discord.js');
+const utils = require("./utils");
+
 
 module.exports = class RolePicker{
     static load(client){
 
-        client.on('message', (message) => {
+        client.on('message', async (message) => {
             if(message.content.startsWith("!msg")){
                 if(message.member.hasPermission(Permissions.FLAGS.ADMINISTRATOR)){
                     let args = message.content.split(" ");
                     let messages = require('./messages.json');
-    
+
                     if(messages[args[1]]){
                         message.channel.send(messages[args[1]])
                     }else{
@@ -19,9 +21,9 @@ module.exports = class RolePicker{
                             })
                         })
                     }
-    
+
                     message.delete();
-    
+
                 }
             }
             if(message.content.startsWith("!say")){
@@ -32,8 +34,12 @@ module.exports = class RolePicker{
                     message.delete();
                 }
             }
-            
+            if (message.partial) {
+                await message.fetch();
+            }
+            if (message.member.roles.cache.has(await utils.get(message.guild.id, "Muet"))) {
+                message.delete();
+            }
         });
-
     }
 }
