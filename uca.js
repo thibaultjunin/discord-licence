@@ -5,6 +5,8 @@ const RolePicker = require('./rolepicker');
 const Channels = require('./channels');
 const Messages = require('./messages');
 const Verification = require('./verification');
+const Sentiment = require('./sentiment');
+const Logging = require('./Logging');
 var env = require('node-env-file');
 env('.env');
 
@@ -16,5 +18,7 @@ RolePicker.load(client);
 Channels.load(client);
 Messages.load(client);
 Verification.load(client);
+Sentiment.load(client);
+Logging.load(client);
 
 client.login(process.env.BOT);

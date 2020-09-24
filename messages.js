@@ -3,7 +3,7 @@ const {Permissions, MessageEmbed} = require('discord.js');
 const utils = require("./utils");
 
 
-module.exports = class RolePicker{
+module.exports = class Message{
     static load(client){
 
         client.on('message', async (message) => {
