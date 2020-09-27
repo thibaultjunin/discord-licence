@@ -34,12 +34,6 @@ module.exports = class Message{
                     message.delete();
                 }
             }
-            if (message.partial) {
-                await message.fetch();
-            }
-            if (message.member.roles.cache.has(await utils.get(message.guild.id, "Muet"))) {
-                message.delete();
-            }
         });
     }
 }

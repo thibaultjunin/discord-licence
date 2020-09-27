@@ -5,8 +5,10 @@ const RolePicker = require('./rolepicker');
 const Channels = require('./channels');
 const Messages = require('./messages');
 const Verification = require('./verification');
+const Moderation = require('./moderation');
 const Sentiment = require('./sentiment');
 const Logging = require('./Logging');
+
 var env = require('node-env-file');
 env('.env');
 
@@ -18,6 +20,7 @@ RolePicker.load(client);
 Channels.load(client);
 Messages.load(client);
 Verification.load(client);
+Moderation.load(client);
 Sentiment.load(client);
 Logging.load(client);
 
