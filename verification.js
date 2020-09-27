@@ -60,7 +60,7 @@ module.exports = class Verification{
                                         // console.log("Role verification added")
                                     })
 
-                                
+
                                 for (let k = 0; k < m.roles.cache.array().length; k++) {
                                     const e = m.roles.cache.array()[k];
                                     if(e.id == VERIF || e.id == message.guild.id){ continue; }
@@ -71,9 +71,9 @@ module.exports = class Verification{
                                     m.roles.remove(e.id, "Suppression des rôles en attente de vérification").catch(e => {
                                         console.error("Remove roles: ", e);
                                     });
-                                }                          
+                                }
 
-                                
+
                                 message.guild.channels.cache.get(VERIF_CHANNEL).send('<@' + m.id + '>', {
                                     embed: {
                                         title: "Vérification requise.",
@@ -107,12 +107,12 @@ module.exports = class Verification{
                                             })
                                         })
                                     })
-                                
+
                                 // On stocke la demande de vérification
                                 connection.query("INSERT INTO verifications SET user = ?, server = ?", [m.id, message.guild.id])
 
                             })
-                            
+
                         }
                     }else{
                         message.reply("Veuillez mentionner une ou plusieurs personnes à vérifier.")
@@ -147,7 +147,7 @@ module.exports = class Verification{
                             }
 
                             if(notFound){
-                                // On a trouvé personne avec ce numéro... 
+                                // On a trouvé personne avec ce numéro...
                                 message.channel.send("Numéro étudiant inconnu, veuillez réessayer.")
                                 message.channel.stopTyping();
                                 return;
@@ -183,7 +183,7 @@ module.exports = class Verification{
 
                             message.channel.stopTyping();
 
-                            // On informe 
+                            // On informe
                             message.channel.send('', {
                                 embed: {
                                     title: name,
@@ -252,12 +252,12 @@ module.exports = class Verification{
                                                 })
 
                                             })
-        
+
                                             member.roles.add(await Utils.get(server, "verified_role"), "Ajout du role vérifié").catch(e => {
                                                 // console.error("Add roles ", e)
                                             })
                                             member.setNickname(Buffer.from(res[0].name, 'base64').toString('utf-8'), "Changement du nom après vérification")
-        
+
                                         })
                                         guild.channels.cache.get(await Utils.get(server, "teacher_channel")).send('', {
                                             embed: {
@@ -449,7 +449,7 @@ module.exports = class Verification{
                                 return;
                             }
 
-                            let name = main.getElementsByClassName('titre')[0].innerHTML.replace(/(<([^>]+)>)/ig, "").replace(/(?:\r\n|\r|\n)/g, '').replace('M. ', '').replace('Mme ', '');                    
+                            let name = main.getElementsByClassName('titre')[0].innerHTML.replace(/(<([^>]+)>)/ig, "").replace(/(?:\r\n|\r|\n)/g, '').replace('M. ', '').replace('Mme ', '');
 
                             let email = null;
                             let links = main.getElementsByTagName('a');
