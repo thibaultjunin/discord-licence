@@ -23,7 +23,7 @@ module.exports = class RolePicker{
             // // Ajout du role
             connection.query('SELECT uuid FROM pickers WHERE channel_id = ?', [reaction.message.channel.id], (err, res, fie) => {
                 if(err != null || res.length == 0){
-                    console.log(error);
+                    console.log(err);
                     return;
                 }
 
@@ -430,7 +430,6 @@ module.exports = class RolePicker{
 
             embed.setDescription("Cliquez sur les réactions pour obtenir les rôles correspondants.");
             embed.setAuthor(client.user.username, client.user.avatarURL());
-            // embed.setFooter("Brought to you by 💊"); // FIXME:
 
             connection.query('SELECT * FROM pickers WHERE channel_id = ?', [channel.id], (err, results, fields) => {
                 if(err != null || results.length == 0){

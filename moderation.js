@@ -6,15 +6,19 @@ module.exports = class Moderation {
 
     static load(client) {
         client.on('message', async (message) => {
-            if (message.content.startsWith("!warn")) {
-                const m_array = message.mentions.members.array()
-                const warn_role = await utils.get(message.guild.id, "Avertissement");
+            if (message.content.startsWith('!warn') && message.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
+                const m_array = message.mentions.members.array();
+                const warn_role = await utils.get(message.guild.id, "avertissement");
+
                 for (let i = 0; i < m_array.length; i++) {
                     const element = m_array[i];
+
                     let m = await element.fetch(true);
 
+                    console.log(warn_role);
+
                     m.roles.add(warn_role, "Avertissement suite à un comportement non acceptable")
-                        .catch(e => {console.log(e)});
+                        .catch(e => {console.error(e)});
                     m.createDM()
                         .then(channel => {
                             channel.startTyping();
@@ -29,14 +33,13 @@ module.exports = class Moderation {
                                 }
                             })
                             .catch(e => {
-                                console.log(e);
+                                console.error(e);
                             })
                             channel.stopTyping();
+                        }).catch(err => {
+                            console.error(err);
                         });
                 }
-            }
-            if (message.partial) {
-                await message.fetch();
             }
             if (message.member.roles.cache.has(await utils.get(message.guild.id, "Muet"))) {
                 message.delete();

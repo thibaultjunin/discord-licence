@@ -14,8 +14,9 @@
     "dom-parser": "^0.1.6",
     "mysql": "^2.18.1",
     "node-env-file": "^0.1.8",
-    "nodemailer": "^6.4.11",
+    "nodemailer": "^6.4.13",
     "sentiment": "^5.0.2",
-    "uuid": "^8.3.0"
+    "sharp": "^0.26.1",
+    "uuid": "^8.3.1"
   }
 }
