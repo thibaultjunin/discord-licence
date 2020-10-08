@@ -1,5 +1,5 @@
 'use strict';
-const GUILD = "747824621486866612";
+const GUILD = "687978521796411441";
 const sharp = require('sharp');
 
 module.exports = class Logo{
