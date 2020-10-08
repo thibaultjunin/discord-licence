@@ -2,7 +2,7 @@
 var Sentiment = require('sentiment');
 var sentiment = new Sentiment();
 let frLang = {
-    labels: { 'stupide': -2 },
+    labels: require('./fr_sentiment.json'),
     scoringStrategy: {
         apply: function(tokens, cursor, tokenScore) {
             if (cursor > 0) {
@@ -27,10 +27,8 @@ module.exports = class Sentiment{
             }
 
             let resultFr = sentiment.analyze(message.content, { language: 'fr' });
-            let resultEn = sentiment.analyze(message.content);
-            console.log(message.content);
-            console.log(resultFr , resultEn);
-            if(resultFr.score < -1 || resultEn.score < -1){
+            console.log(resultFr);
+            if(resultFr.score < -1){
                 message.react(`😔`);
             }
 

@@ -1,5 +1,5 @@
 'use strict';
-const GUILD = "747824621486866612";
+const GUILD = "687978521796411441";
 const sharp = require('sharp');
 
 module.exports = class Logo{
@@ -23,7 +23,7 @@ module.exports = class Logo{
                 addon = "./icons/nouvelan.png"
             }else if(now.getMonth() == 1 && (now.getDate() >= 13 && now.getDate() <= 15)){
                 // St Valentin
-                addon = "./icons/ballons.png"
+                addon = "./icons/ballonsCoeur.png"
             }else if(now.getMonth() == 3){
                 // Paques
                 addon = "./icons/paques.png"
