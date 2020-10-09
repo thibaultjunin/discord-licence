@@ -2,7 +2,7 @@
 
 <img src="https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png" align="right" alt="Licence Informatique@UCA Discord Bot" width="200" height="200">
 
-Welcome to the "Licence Informatique@UCA" discord bot repo 🎉. This bot is primarily used on the "Licence Informatique@UCA" discord server. Which is the discord server for the bachelor in computer science at University Cote D'Azur (Nice, France).  
+Welcome to the "Licence Informatique@UCA" discord bot repo 🎉. This bot is primarily used on the "Licence Informatique@UCA" discord server. Which is the discord server for the bachelor in computer science at University Côte D'Azur (Nice, France).  
 
 Feel free to fork this project change whatever you want 😉 And don't forget to open a pull request!
 
