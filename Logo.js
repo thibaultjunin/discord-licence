@@ -1,12 +1,12 @@
 'use strict';
-const GUILD = "687978521796411441";
+const GUILD = "687978521796411441"; // FIXME: Store it in db
 const sharp = require('sharp');
 
 module.exports = class Logo{
     static load(client){
         setInterval(async () => {
             let now = new Date();
-            if(now.getHours() != 0 && now.getMinutes() != 0){
+            if(now.getHours() != 0 || now.getMinutes() != 0){
                 return;
             }
 
@@ -66,6 +66,7 @@ module.exports = class Logo{
                 .composite([{
                     input: base,
                 }])
+                .overlayWith('./circle.svg')
                 .png()
                 .toBuffer();
 
