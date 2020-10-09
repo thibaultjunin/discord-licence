@@ -1,10 +1,9 @@
 'use strict';
-const {Permissions, MessageEmbed, Role} = require('discord.js');
-const fs = require("fs");
+const {Permissions, MessageEmbed} = require('discord.js');
 var mysql      = require('mysql');
 const { v4: uuidv4 } = require('uuid');
 var env = require('node-env-file');
-env('.env');
+env('../.env');
 var connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST,
   user     : process.env.MYSQL_USER,
@@ -61,50 +60,7 @@ module.exports = class RolePicker{
 
                 })
 
-                // for (let i = 0; i < roles[reaction.message.channel.id].roles.length; i++) {
-                //     const el = roles[reaction.message.channel.id].roles[i];
-                //     if(el.emote == emote){
-                //         let roleID  = el.role;
-                //         guild.members.fetch(user.id).then(member => {
-                //             member.roles.add(roleID, "L'utilisateur a demandé le role " + el.title)
-                //                 .catch(e => {
-                //                     console.log(e)
-                //                 });
-                //         })
-                        
-                //     }
-                // }
-
             })
-            // let roles = require('./picker.json'); // FIXME: File to replace via MYSQL
-            // if(roles[reaction.message.channel.id] != undefined){
-            //     let emote = null;
-            //     if(reaction.emoji.id == null){
-            //         // global emote
-            //         emote = "@" + reaction.emoji.name
-            //     }else{
-            //         // custom emote
-            //         emote = reaction.emoji.id
-            //     }
-
-            //     let channel = client.channels.cache.get(reaction.message.channel.id);
-            //     let guild = channel.guild;
-
-            //     for (let i = 0; i < roles[reaction.message.channel.id].roles.length; i++) {
-            //         const el = roles[reaction.message.channel.id].roles[i];
-            //         if(el.emote == emote){
-            //             let roleID  = el.role;
-            //             guild.members.fetch(user.id).then(member => {
-            //                 member.roles.add(roleID, "L'utilisateur a demandé le role " + el.title)
-            //                     .catch(e => {
-            //                         console.log(e)
-            //                     });
-            //             })
-                        
-            //         }
-            //     }
-
-            // }
         })
         client.on('messageReactionRemove', async (reaction, user) => {
             if (reaction.partial) {
@@ -152,50 +108,7 @@ module.exports = class RolePicker{
 
                 })
 
-                // for (let i = 0; i < roles[reaction.message.channel.id].roles.length; i++) {
-                //     const el = roles[reaction.message.channel.id].roles[i];
-                //     if(el.emote == emote){
-                //         let roleID  = el.role;
-                //         guild.members.fetch(user.id).then(member => {
-                //             member.roles.add(roleID, "L'utilisateur a demandé le role " + el.title)
-                //                 .catch(e => {
-                //                     console.log(e)
-                //                 });
-                //         })
-                        
-                //     }
-                // }
-
             })
-            // let roles = require('./picker.json');  // FIXME: File to replace via MYSQL
-            // if(roles[reaction.message.channel.id] != undefined){
-            //     let emote = null;
-            //     if(reaction.emoji.id == null){
-            //         // global emote
-            //         emote = "@" + reaction.emoji.name
-            //     }else{
-            //         // custom emote
-            //         emote = reaction.emoji.id
-            //     }
-
-            //     let channel = client.channels.cache.get(reaction.message.channel.id);
-            //     let guild = channel.guild;
-
-            //     for (let i = 0; i < roles[reaction.message.channel.id].roles.length; i++) {
-            //         const el = roles[reaction.message.channel.id].roles[i];
-            //         if(el.emote == emote){
-            //             let roleID  = el.role;
-            //             guild.members.fetch(user.id).then(member => {
-            //                 member.roles.remove(roleID, "L'utilisateur ne veux plus le role " + el.title)
-            //                     .catch(e => {
-            //                         console.log(e)
-            //                     });
-            //             })
-                        
-            //         }
-            //     }
-
-            // }
         })
 
         client.on('message', (message) => {
@@ -248,42 +161,7 @@ module.exports = class RolePicker{
                             });
                         }
 
-                        // message.channel.messages.fetch()
-                        //     .then(async (messages) => {
-                        //         let hasPicker = false;
-                        //         let pickerMessage = null;
-                        //         messages.forEach(el => {
-                        //             if(el.author.id == client.user.id && !el.content.includes("!picker")){
-                        //                 pickerMessage = el;
-                        //                 hasPicker = true;
-                        //             }
-                        //         })
-                        //         if(hasPicker){
-                        //             // Edit
-                        //             let em = await RolePicker.getPickerEmbed(client, message.channel);
-                        //             pickerMessage.edit(em).then(msg => {
-                        //                     RolePicker.updateReactions(msg)
-                        //                 })
-                        //         }else{
-                        //             // Add
-                        //             let em = await RolePicker.getPickerEmbed(client, message.channel);
-                        //             message.channel.send(em)
-                        //                 .then(msg => {RolePicker.updateReactions(msg)})
-                        //         }
-                        //     })
-
                     });
-
-                    // let roles = require('./picker.json'); // FIXME: File to replace via MYSQL
-                    // if(roles[message.channel.id] == undefined){
-                    //     roles[message.channel.id] = {
-                    //         roles: [],
-                    //         name: null,
-                    //         id: null,
-                    //     }
-                    // }
-                    // roles[message.channel.id].name = title;
-                    // fs.writeFile("./picker.json", JSON.stringify(roles), err => {}); // FIXME: File to replace via MYSQL
 
                     message.delete();
                 }
@@ -348,48 +226,6 @@ module.exports = class RolePicker{
                         })
 
                     });
-                    
-                    // let roles = require('./picker.json'); // FIXME: File to replace via MYSQL
-                    // if(roles[message.channel.id] == undefined){
-                    //     roles[message.channel.id] = {
-                    //         roles: [],
-                    //         name: null
-                    //     }
-                    // }
-                    // if(roles[message.channel.id].roles == undefined){
-                    //     roles[message.channel.id].roles = [];
-                    // }
-                    // roles[message.channel.id].roles.push({
-                    //     role: role,
-                    //     emote: emote,
-                    //     title: RoleTitle,
-                    // })
-                    // fs.writeFile("./picker.json", JSON.stringify(roles), err => {}); // FIXME: File to replace via MYSQL
-
-                    // RolePicker.updateOrSendMessage(message, client);
-
-                    // message.channel.messages.fetch()
-                    //     .then(async (messages) => {
-                    //         let hasPicker = false;
-                    //         let pickerMessage = null;
-                    //         messages.forEach(el => {
-                    //             if(el.author.id == client.user.id && (!el.content.includes("!picker") || !el.content.includes("!role"))){
-                    //                 pickerMessage = el;
-                    //                 hasPicker = true;
-                    //             }
-                    //         })
-                    //         if(hasPicker){
-                    //             // Edit
-                    //             let em = await RolePicker.getPickerEmbed(client, message.channel);
-                    //             pickerMessage.edit(em)
-                    //                 .then(msg => {RolePicker.updateReactions(msg)})
-                    //         }else{
-                    //             // Add
-                    //             let em = await RolePicker.getPickerEmbed(client, message.channel)
-                    //             message.channel.send(em)
-                    //                 .then(msg => {RolePicker.updateReactions(msg)})
-                    //         }
-                    //     })
 
                     message.delete();
                     // !role @UCA :worldwide:  Test
@@ -464,40 +300,9 @@ module.exports = class RolePicker{
                 })
             })            
         });
-        // let roles = require('./picker.json'); // FIXME: File to replace via MYSQL
-        // if(roles[channel.id] == undefined){
-        //     roles[channel.id] = {
-        //         roles: [],
-        //         name: null
-        //     }
-        // }
-
-        // let embed = new MessageEmbed();
-        // embed.setTitle(roles[channel.id].name)
-        // embed.setDescription("Cliquez sur les réactions pour obtenir les rôles correspondants.");
-        // embed.setAuthor(client.user.username, client.user.avatarURL());
-
-        // if(roles[channel.id].roles != undefined){
-
-        //     // Add the roles
-        //     roles[channel.id].roles.forEach(role => {
-        //         let str = null;
-        //         if(role.emote.startsWith("@")){
-        //             str = role.emote.replace("@", "");
-        //         }else{
-        //             let emote = channel.guild.emojis.resolve(role.emote)
-        //             str = "<:" + emote.name + ":" + emote.id + ">";
-        //         }
-        //         embed.addField(role.title, "Cliquez sur " + str + ".", false)
-        //     })
-
-        // }
-
-        // return embed;
     }
 
     static updateReactions(message){
-        // let roles = require('./picker.json'); // FIXME: File to replace via MYSQL
         connection.query('SELECT uuid FROM pickers WHERE channel_id = ?', [message.channel.id], (err, results, fields) => {
             if(err != null || results.length == 0){
                 console.error(err);
@@ -548,45 +353,6 @@ module.exports = class RolePicker{
             });
 
         });
-        /*if(roles[message.channel.id].roles != undefined){
-
-            roles[message.channel.id].roles.forEach(role => {
-
-                let testAgainst = null;
-                if(new RegExp("^[0-9]+$").test(role.emote)){
-                    // C'est une emote custom
-                    let emote = message.channel.guild.emojis.resolve(role.emote)
-                    testAgainst = emote.id;
-                }else{
-                    // C'est pas une emote custom
-                    testAgainst = role.emote.replace('@', '');
-                }
-
-                let has = false;
-                
-                message.reactions.cache.forEach(reac => {
-                    if(reac.id == null){
-                        // Emoji global
-                        if(reac._emoji.name == testAgainst){
-                            has = true;
-                        }
-                    }else{
-                        // Emoji custom
-                        if(reac.id == testAgainst){
-                            has = true;
-                        }
-                    }
-                });
-                
-                if(!has){
-                    message.react(testAgainst)
-                }
-
-            })
-
-        }else{
-            message.reactions.removeAll();
-        }*/
     }
 
 }

@@ -1,14 +1,14 @@
 'use strict';
 const Discord = require('discord.js');
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
-const RolePicker = require('./rolepicker');
-const Channels = require('./channels');
-const Messages = require('./messages');
-const Verification = require('./verification');
-const Moderation = require('./moderation');
-const Sentiment = require('./sentiment');
-const Logging = require('./Logging');
-const Logo = require('./Logo');
+const RolePicker = require('./Components/Rolepicker');
+const Channels = require('./Components/Channels');
+const Messages = require('./Components/Messages');
+const Verification = require('./Components/Verification');
+const Moderation = require('./Components/Moderation');
+const Sentiment = require('./Components/Sentiment');
+const Logging = require('./Components/Logging');
+const Logo = require('./Components/Logo');
 
 var env = require('node-env-file');
 env('.env');

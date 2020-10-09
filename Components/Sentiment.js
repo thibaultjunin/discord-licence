@@ -2,7 +2,7 @@
 var Sentiment = require('sentiment');
 var sentiment = new Sentiment();
 let frLang = {
-    labels: require('./fr_sentiment.json'),
+    labels: require('../Data/fr_sentiment.json'),
     scoringStrategy: {
         apply: function(tokens, cursor, tokenScore) {
             if (cursor > 0) {

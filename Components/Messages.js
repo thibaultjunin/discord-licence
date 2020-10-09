@@ -1,6 +1,5 @@
 'use strict';
-const {Permissions, MessageEmbed} = require('discord.js');
-const utils = require("./utils");
+const {Permissions} = require('discord.js');
 
 
 module.exports = class Message{
@@ -10,7 +9,7 @@ module.exports = class Message{
             if(message.content.startsWith("!msg")){
                 if(message.member.hasPermission(Permissions.FLAGS.ADMINISTRATOR)){
                     let args = message.content.split(" ");
-                    let messages = require('./messages.json');
+                    let messages = require('../Data/messages.json');
 
                     if(messages[args[1]]){
                         message.channel.send(messages[args[1]])

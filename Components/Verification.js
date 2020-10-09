@@ -1,21 +1,19 @@
 'use strict';
 const {Permissions, MessageEmbed} = require('discord.js');
-const fs = require("fs");
 const axios = require('axios');
 const DomParser = require('dom-parser');
 const parser = new DomParser();
 const nodemailer = require("nodemailer");
 var mysql      = require('mysql');
-const { v4: uuidv4 } = require('uuid');
 var env = require('node-env-file');
-env('.env');
+env('../.env');
 var connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST,
   user     : process.env.MYSQL_USER,
   password : process.env.MYSQL_PASSWORD,
   database : process.env.MYSQL_DATABASE
 });
-const Utils = require('./utils');
+const Utils = require('../Utils/Utils');
 
 module.exports = class Verification{
 
@@ -204,8 +202,6 @@ module.exports = class Verification{
                     // Il s'aggit d'un code de vérification
 
                     // On recupère les codes et les utilisateurs
-                    // let users = require('./users.json'); // FIXME: File to replace via MYSQL
-                    // let verifications = require('./verifications.json'); // FIXME: File to replace via MYSQL
 
                     connection.query("SELECT * FROM verification_users WHERE discord = ?", [message.author.id], (err, res, fie) => {
 
@@ -328,104 +324,6 @@ module.exports = class Verification{
 
                     })
 
-                    // if(message.content == users[message.author.id].code){
-
-                    //     let r = "";
-                    //     if(users[message.author.id].role == "teacher"){
-                    //         r = "Personnel de l'université"
-                    //     }else{
-                    //         r = "Étudiant"
-                    //     }
-                    //     let servers = verifications[message.author.id];
-                    //     for (let i = 0; i < servers.length; i++) {
-                    //         const element = servers[i];
-                    //         client.guilds.fetch(element).then(guild => {
-                    //             guild.members.fetch(message.author.id).then(member => {
-                    //                 member.roles.remove(VERIF, "Vérification complétée, " + users[message.author.id].name);
-
-                    //                 let tempRoles = require('./roles.json') // FIXME: File to replace via MYSQL
-                    //                 // tempRoles[element.id][guild.id]
-                    //                 for (let z = 0; z < tempRoles[member.id][guild.id].length; z++) {
-                    //                     const el = tempRoles[member.id][guild.id][z];
-                    //                     member.roles.add(el, "Remises des rôles originaux après vérification").catch(e => {
-                    //                         console.error("Add roles ", e)
-                    //                     })
-                    //                 }
-                    //                 tempRoles[member.id][guild.id] = undefined;
-                    //                 fs.writeFile("./roles.json", JSON.stringify(tempRoles), err => {});
-
-                    //                 member.roles.add(process.env.VERIFIED /* FIXME: */, "Ajout du role vérifié").catch(e => {
-                    //                     // console.error("Add roles ", e)
-                    //                 })
-                    //                 member.setNickname(users[message.author.id].name, "Changement du nom après vérification")
-
-                    //             })
-                    //             guild.channels.cache.get(process.env.TEACHER_CHANNEL/* FIXME: */).send('', {
-                    //                 embed: {
-                    //                     title: "Vérification de " + message.author.username,
-                    //                     description: 'L\'utilisateur <@' + message.author.id + "> a complété le processus de vérification suite à votre demande.\n\nNous pouvons vous confirmer que cet utilisateur est un **"+r+"**.\nSuite à cette vérification, l'utilisateur dispose de nouveau des droits afin d'accéder à l'entièreté du serveur.",
-                    //                     footer: {
-                    //                         text: client.user.username,
-                    //                         iconURL: client.user.avatarURL()
-                    //                     },
-                    //                     fields: [
-                    //                         {
-                    //                             name: "Numéro étudiant/Login",
-                    //                             value: users[message.author.id].id,
-                    //                             inline: true,
-                    //                         },{
-                    //                             name: "Identité",
-                    //                             value: users[message.author.id].name,
-                    //                             inline: true,
-                    //                         },{
-                    //                             name: "Email universitaire",
-                    //                             value: users[message.author.id].email
-                    //                         }
-                    //                     ],
-                    //                     timestamp: "0"
-                    //                 }
-                    //             })
-                    //         });
-                    //     }
-
-                        // // On informe
-                        // message.channel.send('', {
-                        //     embed: {
-                        //         title: users[message.author.id].name,
-                        //         description: 'Parfait! La vérification de votre identité est maintenant complétée.',
-                        //         footer: {
-                        //             text: client.user.username,
-                        //             iconURL: client.user.avatarURL()
-                        //         }
-                        //     }
-                        // })
-
-                        // // On supprime toutes les données temporaires
-
-                        // setTimeout(() => {
-                        //     Verification.removeUser(message.author.id);
-                        // }, 10000);
-
-                    //     message.channel.stopTyping();
-
-                    // }else{
-
-                    //     // NOPE
-                    //     // Le code n'est pas correct
-                    //     message.channel.send('', {
-                    //         embed: {
-                    //             title: users[message.author.id].name,
-                    //             description: 'Ceci n\'est pas le code correct. Veuillez réessayer...',
-                    //             footer: {
-                    //                 text: client.user.username,
-                    //                 iconURL: client.user.avatarURL()
-                    //             }
-                    //         }
-                    //     })
-                    //     message.channel.stopTyping();
-
-                    // }
-
                 }else{
 
                     // il s'agit d'un personnel de l'université
@@ -513,18 +411,6 @@ module.exports = class Verification{
     }
 
     static saveUser(userID, name, email, role, code, num){
-        // Save in file users.json
-        // userID est la clef
-        // let users = require('./users.json'); // FIXME: File to replace via MYSQL
-        // users[userID] = {
-        //     user: userID,
-        //     name: name,
-        //     email: email,
-        //     role: role,
-        //     code: code,
-        //     id: num
-        // };
-        // fs.writeFile("./users.json", JSON.stringify(users), err => {});
         connection.query("INSERT INTO verification_users SET ?", {
             discord: userID,
             name: Buffer.from(name, 'utf-8').toString('base64'),
@@ -536,14 +422,6 @@ module.exports = class Verification{
     }
 
     static removeUser(userID){
-        // Save in file users.json
-        // userID est la clef
-        // let users = require('./users.json'); // FIXME: File to replace via MYSQL
-        // users[userID] = undefined;
-        // fs.writeFile("./users.json", JSON.stringify(users), err => {});
-        // let verifications = require('./verifications.json'); // FIXME: File to replace via MYSQL
-        // verifications[userID] = undefined;
-        // fs.writeFile("./verifications.json", JSON.stringify(verifications), err => {});
         connection.query("DELETE FROM verification_users WHERE discord = ?", [userID]);
         connection.query("DELETE FROM verifications WHERE user = ?", [userID]);
         connection.query("DELETE FROM user_roles WHERE user = ?", [userID]);

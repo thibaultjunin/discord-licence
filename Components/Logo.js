@@ -14,31 +14,31 @@ module.exports = class Logo{
             let addon = null;
             if(now.getMonth() == 9){
                 // Halloween
-                addon = "./icons/citrouille.png"
+                addon = "../Icons/citrouille.png"
             }else if(now.getMonth() == 11 && (now.getDate() >= 10 && now.getDate() <= 28)){
                 // Noel
-                addon = "./icons/hiver.png"
+                addon = "../Icons/hiver.png"
             }else if(now.getMonth() == 0 && now.getDate() <= 10){
                 // Nouvel an
-                addon = "./icons/nouvelan.png"
+                addon = "../Icons/nouvelan.png"
             }else if(now.getMonth() == 1 && (now.getDate() >= 13 && now.getDate() <= 15)){
                 // St Valentin
-                addon = "./icons/ballonsCoeur.png"
+                addon = "../Icons/ballonsCoeur.png"
             }else if(now.getMonth() == 3){
                 // Paques
-                addon = "./icons/paques.png"
+                addon = "../Icons/paques.png"
             }else if(now.getMonth() == 6 || now.getMonth() == 7){
                 // Vacances
-                addon = "./icons/ete.png"
+                addon = "../Icons/ete.png"
             }else{
-                addon = "./icons/ordi.png"
+                addon = "../Icons/ordi.png"
             }
 
             let icon = await sharp(addon)
                 .png()
                 .resize(200)
                 .toBuffer();
-            base = await sharp('./base2.png')
+            base = await sharp('../Icons/base.png')
                 .composite([{
                     input: icon,
                 }])
@@ -61,7 +61,7 @@ module.exports = class Logo{
                 .composite([{
                     input: base,
                 }])
-                .overlayWith('./circle.svg')
+                .overlayWith('../Icons/circle.svg')
                 .png()
                 .toBuffer();
 

@@ -1,6 +1,6 @@
 'use strict';
-const {Permissions, MessageEmbed} = require('discord.js');
-const utils = require('./utils');
+const {Permissions} = require('discord.js');
+const utils = require('../Utils/Utils');
 
 module.exports = class Moderation {
 

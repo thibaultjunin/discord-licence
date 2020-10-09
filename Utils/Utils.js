@@ -1,7 +1,7 @@
 'use strict';
 var mysql      = require('mysql');
 var env = require('node-env-file');
-env('.env');
+env('../.env');
 var connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST,
   user     : process.env.MYSQL_USER,
