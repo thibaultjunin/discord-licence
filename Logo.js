@@ -31,24 +31,19 @@ module.exports = class Logo{
                 // Vacances
                 addon = "./icons/ete.png"
             }else{
-                base = await sharp('./base.png')
-                    .png()
-                    .toBuffer();
+                addon = "./icons/ordi.png"
             }
 
-            
-            if(addon != null){
-                let icon = await sharp(addon)
-                    .png()
-                    .resize(200)
-                    .toBuffer();
-                base = await sharp('./base2.png')
-                    .composite([{
-                        input: icon,
-                    }])
-                    .png()
-                    .toBuffer();
-            }
+            let icon = await sharp(addon)
+                .png()
+                .resize(200)
+                .toBuffer();
+            base = await sharp('./base2.png')
+                .composite([{
+                    input: icon,
+                }])
+                .png()
+                .toBuffer();
 
             if(base == null){
                 console.error("oopsi")
