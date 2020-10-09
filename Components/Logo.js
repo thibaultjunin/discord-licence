@@ -10,7 +10,6 @@ module.exports = class Logo{
                 return;
             }
 
-            let base = null;
             let addon = null;
             if(now.getMonth() == 9){
                 // Halloween
@@ -38,17 +37,12 @@ module.exports = class Logo{
                 .png()
                 .resize(200)
                 .toBuffer();
-            base = await sharp('../Icons/base.png')
+            let base = await sharp('../Icons/base.png')
                 .composite([{
                     input: icon,
                 }])
                 .png()
                 .toBuffer();
-
-            if(base == null){
-                console.error("oopsi")
-                return;
-            }
             
             let image = await sharp({
                 create: {
