@@ -3,7 +3,8 @@ const {Permissions} = require('discord.js');
 const Utils = require('../Utils/Utils');
 const fs = require("fs");
 var env = require('node-env-file');
-env('../.env');
+const path = require('path');
+env(path.resolve(__dirname, '../.env'));
 
 module.exports = class Channels{
 

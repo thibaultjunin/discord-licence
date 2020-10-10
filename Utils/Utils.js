@@ -1,7 +1,8 @@
 'use strict';
 var mysql      = require('mysql');
 var env = require('node-env-file');
-env('../.env');
+const path = require('path');
+env(path.resolve(__dirname, '../.env'));
 var connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST,
   user     : process.env.MYSQL_USER,
@@ -14,10 +15,13 @@ module.exports = class Utils{
 
     static get(server, setting){
         console.log(server, setting);
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             connection.query("SELECT value FROM settings WHERE server = ? AND parameter = ?", [server, setting], (error, result, fields) => {
                 if(error != null){
-                    reject(error);
+                    return;
+                }
+
+                if(result[0] == undefined || result[0].value == undefined){
                     return;
                 }
 

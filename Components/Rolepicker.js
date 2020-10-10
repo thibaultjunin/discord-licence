@@ -3,7 +3,8 @@ const {Permissions, MessageEmbed} = require('discord.js');
 var mysql      = require('mysql');
 const { v4: uuidv4 } = require('uuid');
 var env = require('node-env-file');
-env('../.env');
+const path = require('path');
+env(path.resolve(__dirname, '../.env'));
 var connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST,
   user     : process.env.MYSQL_USER,

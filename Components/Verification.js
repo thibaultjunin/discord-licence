@@ -6,7 +6,8 @@ const parser = new DomParser();
 const nodemailer = require("nodemailer");
 var mysql      = require('mysql');
 var env = require('node-env-file');
-env('../.env');
+const path = require('path');
+env(path.resolve(__dirname, '../.env'));
 var connection = mysql.createConnection({
   host     : process.env.MYSQL_HOST,
   user     : process.env.MYSQL_USER,
