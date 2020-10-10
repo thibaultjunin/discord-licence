@@ -52,7 +52,6 @@ module.exports = class Logging{
             ]);
         });
         client.on('messageUpdate', (oldMember, newMember) => {
-            console.log(newMember);
             connection.query("INSERT INTO logs SET server = ?, user = ?, action = ?, content = ?", [
                 newMember.guild.id,
                 "Unknown", 

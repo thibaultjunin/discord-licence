@@ -2,6 +2,8 @@
 const GUILD = "747824621486866612"; // FIXME: Store it in db
 const sharp = require('sharp');
 const {Permissions} = require('discord.js');
+const path = require('path');
+const ComplementaryColor = require('../Utils/ComplementaryColor');
 
 module.exports = class Logo{
     static load(client){
@@ -11,23 +13,24 @@ module.exports = class Logo{
                 return;
             }
             
-            Logo.updateIcon();
+            Logo.updateIcon(client);
 
         }, 60000);
 
         client.on('message', message => {
             if(message.content.startsWith('!icon') && message.member.hasPermission(Permissions.FLAGS.MANAGE_GUILD)){
-                Logo.updateIcon();
+                Logo.updateIcon(client);
                 message.reply("Done").then(msg => {
                     msg.delete({
                         timeout: 3000
                     })
+                    message.delete();
                 });
             }
         })
     }
 
-    static async updateIcon(){
+    static async updateIcon(client){
         let now = new Date();
 
         let addon = null;
@@ -53,37 +56,82 @@ module.exports = class Logo{
             addon = "../Icons/ordi.png"
         }
 
+        addon = path.resolve(__dirname, addon)
+
+        let complementary = new ComplementaryColor();
+
+        let backgroundColor = Logo.getDayRGB();
+        let complementaryColor = complementary.RGB2HSV(backgroundColor);
+        complementaryColor.hue = complementary.HueShift(complementaryColor.hue, 180.0);
+        complementaryColor = complementary.HSV2RGB(complementaryColor);
+
+        backgroundColor.alpha = 1
+        complementaryColor.alpha = 1
+
+        // Loading the addon icon, resize it to width 200px
         let icon = await sharp(addon)
             .png()
             .resize(200)
             .toBuffer();
-        let base = await sharp('../Icons/base.png')
+
+        // Loading the base icon and add it the addon
+        let base = await sharp(path.resolve(__dirname, '../Icons/base.png'))
             .composite([{
                 input: icon,
             }])
             .png()
             .toBuffer();
         
+        // Creating a 600x600px single color image to change the base icon's one
         let image = await sharp({
             create: {
                 width: 600,
                 height: 600,
                 channels: 4,
-                background: Logo.getDayRGB()
+                background: complementaryColor
             }
         })
-            .overlayWith('../Icons/circle.svg')
             .composite([{
                 input: base,
+                blend: 'dest-in'
             }])
-            
             .png()
             .toBuffer();
 
+        // Loading the circle.png image
+        let circle = await sharp(path.resolve(__dirname, '../Icons/circle.png'))
+            .png()
+            .toBuffer();
+        // Creating a 600x600px single color image, to change circle.png color
+        let circleColor = await sharp({
+            create: {
+                width: 600,
+                height: 600,
+                channels: 4,
+                background: backgroundColor
+            }
+        })
+            .composite([{
+                input: circle,
+                blend: 'dest-in'
+            }])
+            .png()
+            .toBuffer();
+            
+
+        // Combining both images to make the final icon
+        let finalIcon = await sharp(circleColor)
+            .composite([{
+                input: image
+            }])
+            .png()
+            .toBuffer();
+            
         client.guilds.fetch(GUILD).then(g => {
-            g.setIcon(image).catch(ex1 => console.error("Set Icon", ex1))
+            g.setIcon(finalIcon).catch(ex1 => console.error("Set Icon", ex1))
+            console.log("changed");
         }).catch(ex2 => console.error("Fetch Guild", ex2))
-        client.user.setAvatar(image);
+        client.user.setAvatar(finalIcon).catch(ex3 => console.error("Avatar", ex3));
     }
 
     static getDayRGB(){
@@ -95,18 +143,16 @@ module.exports = class Logo{
 
         if(day < 256){
             return {
-                r: day,
+                r: Math.floor(Math.random() * Math.floor(day)),
                 g: Math.floor(Math.random() * Math.floor(255)), // Random is always fun
-                b: day,
-                alpha: 1
+                b: Math.floor(Math.random() * Math.floor(day)),
             }
         }else{
 
             return {
-                r: 365-day,
+                r: Math.floor(Math.random() * Math.floor(365-day)),
                 g: Math.floor(Math.random() * Math.floor(255)), // Random is a lot of fun
-                b: day%365,
-                alpha: 1
+                b: Math.floor(Math.random() * Math.floor(day%365)),
             }
 
         }
