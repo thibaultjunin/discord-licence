@@ -6,6 +6,7 @@ module.exports = class Message{
     static load(client){
 
         client.on('message', async (message) => {
+            if(message.channel.type == "dm"){return;}
             if(message.content.startsWith("!msg")){
                 if(message.member.hasPermission(Permissions.FLAGS.ADMINISTRATOR)){
                     let args = message.content.split(" ");

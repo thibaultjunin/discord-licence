@@ -4,17 +4,11 @@ const axios = require('axios');
 const DomParser = require('dom-parser');
 const parser = new DomParser();
 const nodemailer = require("nodemailer");
-var mysql      = require('mysql');
 var env = require('node-env-file');
 const path = require('path');
 env(path.resolve(__dirname, '../.env'));
-var connection = mysql.createConnection({
-  host     : process.env.MYSQL_HOST,
-  user     : process.env.MYSQL_USER,
-  password : process.env.MYSQL_PASSWORD,
-  database : process.env.MYSQL_DATABASE
-});
 const Utils = require('../Utils/Utils');
+var connection = Utils.getConnection();
 
 module.exports = class Verification{
 

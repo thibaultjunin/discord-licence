@@ -6,6 +6,7 @@ module.exports = class Moderation {
 
     static load(client) {
         client.on('message', async (message) => {
+            if(message.channel.type == "dm"){return;}
             if (message.content.startsWith('!warn') && message.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
                 const m_array = message.mentions.members.array();
                 const warn_role = await utils.get(message.guild.id, "avertissement");

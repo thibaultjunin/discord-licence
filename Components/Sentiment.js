@@ -25,7 +25,8 @@ module.exports = class Sentiment{
             if(message.author.id == client.user.id){
                 return;
             }
-
+            if(message.channel.type == "dm"){return;}
+            
             let resultFr = sentiment.analyze(message.content, { language: 'fr' });
             console.log(resultFr);
             if(resultFr.score < -1){

@@ -10,6 +10,7 @@ module.exports = class Channels{
 
     static load(client){
         client.on('message', async (message) => {
+            if(message.channel.type == "dm"){return;}
 
             if(!message.content.startsWith("!")){
                 return;

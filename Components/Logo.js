@@ -18,6 +18,7 @@ module.exports = class Logo{
         }, 60000);
 
         client.on('message', message => {
+            if(message.channel.type == "dm"){return;}
             if(message.content.startsWith('!icon') && message.member.hasPermission(Permissions.FLAGS.MANAGE_GUILD)){
                 Logo.updateIcon(client);
                 message.reply("Done").then(msg => {

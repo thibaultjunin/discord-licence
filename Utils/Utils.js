@@ -31,4 +31,8 @@ module.exports = class Utils{
         })
     }
 
+    static getConnection(){
+        return connection;
+    }
+
 }
