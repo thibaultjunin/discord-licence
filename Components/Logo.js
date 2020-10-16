@@ -1,9 +1,10 @@
 'use strict';
-const GUILD = "747824621486866612"; // FIXME: Store it in db
+// const GUILD = "747824621486866612"; // FIXME: Store it in db
 const sharp = require('sharp');
 const {Permissions} = require('discord.js');
 const path = require('path');
 const ComplementaryColor = require('../Utils/ComplementaryColor');
+const Utils = require('../Utils/Utils');
 
 module.exports = class Logo{
     static load(client){
@@ -127,11 +128,23 @@ module.exports = class Logo{
             }])
             .png()
             .toBuffer();
+           
+        const guilds = client.guilds.cache.array();
+        for (let index = 0; index < guilds.length; index++) {
+            const element = guilds[index];
             
-        client.guilds.fetch(GUILD).then(g => {
-            g.setIcon(finalIcon).catch(ex1 => console.error("Set Icon", ex1))
-            console.log("changed");
-        }).catch(ex2 => console.error("Fetch Guild", ex2))
+            Utils.get(element.id, "change_icon").then(v => {
+                if(v){
+                    element.setIcon(finalIcon)
+                        .catch(ex1 => console.error("Set Icon", ex1))
+                }
+            })
+
+        }
+        // client.guilds.fetch(GUILD).then(g => {
+        //     g.setIcon(finalIcon).catch(ex1 => console.error("Set Icon", ex1))
+        //     console.log("changed");
+        // }).catch(ex2 => console.error("Fetch Guild", ex2))
         client.user.setAvatar(finalIcon).catch(ex3 => console.error("Avatar", ex3));
     }
 
