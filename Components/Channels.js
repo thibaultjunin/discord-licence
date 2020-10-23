@@ -1,26 +1,34 @@
 'use strict';
-const {Permissions} = require('discord.js');
+const { Permissions } = require('discord.js');
 const Utils = require('../Utils/Utils');
 const fs = require("fs");
 var env = require('node-env-file');
 const path = require('path');
 env(path.resolve(__dirname, '../.env'));
 
-module.exports = class Channels{
+module.exports = class Channels {
 
-    static load(client){
+    static load(client) {
+
+        // When a message is received
         client.on('message', async (message) => {
-            if(message.channel.type == "dm"){return;}
+            // if the message is sent in dms, ignore
+            if (message.channel.type == "dm") { return; }
 
-            if(!message.content.startsWith("!")){
+            // if the message doesn't start with `!`, ignore
+            if (!message.content.startsWith("!")) {
                 return;
             }
 
-            if(message.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)){
-                if(message.content.startsWith("!cours")){
+            // if the user has the `manage role` permission
+            if (message.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
+
+                // if the message starts with `!cours`
+                if (message.content.startsWith("!cours")) {
 
                     const TEACHER = await Utils.get(message.guild.id, "teacher_role");
-                    if(TEACHER == undefined){
+                    if (TEACHER == undefined) {
+                        // Bot not configured
                         message.reply(":x: Teacher role is undefined").then(msg => {
                             msg.delete({
                                 timeout: 3000
@@ -31,7 +39,8 @@ module.exports = class Channels{
                     let args = message.content.split(" ");
                     args.shift();
 
-                    if(args.length < 1){
+                    if (args.length < 1) {
+                        // The title is missing
                         message.reply("Utilisation: !cours Titre").then(msg => {
                             msg.delete({
                                 timeout: 3000
@@ -45,8 +54,7 @@ module.exports = class Channels{
 
                     let guild = message.guild;
 
-                    // Load teacher role from settings
-
+                    // Create a new role
                     guild.roles.create({
                         data: {
                             name: title,
@@ -68,6 +76,7 @@ module.exports = class Channels{
                         },
                         reason: 'Role pour les étudiants du cours ' + title
                     }).then(role => {
+                        // Creating a new category
                         guild.channels.create(title, {
                             type: 'category',
                             reason: 'Ajout d\'un nouveau cours (' + title + ")",
@@ -86,8 +95,6 @@ module.exports = class Channels{
                                 }
                             ]
                         }).then(channel => {
-                            // Add default channels here
-
                             // Create a announcements channel
                             guild.channels.create("annonces", {
                                 type: 'news',
@@ -117,6 +124,7 @@ module.exports = class Channels{
                                 reason: 'Salon général pour ' + title
                             })
 
+                            // Create a general voice channel
                             guild.channels.create("general", {
                                 type: 'voice',
                                 parent: channel.id,
@@ -130,7 +138,7 @@ module.exports = class Channels{
                             })
 
                         });
-                    })                    
+                    })
 
                 }
             }

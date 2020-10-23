@@ -1,5 +1,5 @@
 'use strict';
-const {Permissions, MessageEmbed} = require('discord.js');
+const { Permissions, MessageEmbed } = require('discord.js');
 const axios = require('axios');
 const DomParser = require('dom-parser');
 const parser = new DomParser();
@@ -10,16 +10,18 @@ env(path.resolve(__dirname, '../.env'));
 const Utils = require('../Utils/Utils');
 var connection = Utils.getConnection();
 
-module.exports = class Verification{
+// This is the biggest part of this project. Good luck.
 
-    static load(client){
+module.exports = class Verification {
+
+    static load(client) {
 
         client.on('guildMemberAdd', (member) => {
             connection.query("SELECT id FROM verifications WHERE user = ? AND server = ?", [member.id, member.guild.id], async (error, result, fields) => {
 
-                if(error != null || result.length > 0){
+                if (error != null || result.length > 0) {
                     let verif = await Utils.get(member.guild.id, "verification_role")
-                    if(verif != undefined){
+                    if (verif != undefined) {
                         member.roles.add(verif, "L'utilisateur avait quitter le serveur lors d'un processus de vérification");
                     }
                 }
@@ -28,10 +30,10 @@ module.exports = class Verification{
         })
 
         client.on('message', async (message) => {
-            if(message.content.startsWith('!verification')){
-                if(message.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)){
+            if (message.content.startsWith('!verification')) {
+                if (message.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
                     // Une personne demande la vérification d'une autre.
-                    if(message.mentions.members){
+                    if (message.mentions.members) {
                         const VERIF = await Utils.get(message.guild.id, "verification_role");
                         const VERIF_CHANNEL = await Utils.get(message.guild.id, "verification_channel");
 
@@ -42,13 +44,13 @@ module.exports = class Verification{
 
                             connection.query("SELECT id FROM verifications WHERE user = ? AND server = ?", [m.id, message.guild.id], (e1, r1, f1) => {
                                 console.log(e1, r1, r1.length);
-                                if(e1 != null || r1.length > 0 ){
-                                    message.reply("<@"+m.id+"> a déjà une demande de vérification en cours...")
+                                if (e1 != null || r1.length > 0) {
+                                    message.reply("<@" + m.id + "> a déjà une demande de vérification en cours...")
                                     return;
                                 }
 
                                 m.roles.add(VERIF, "Vérification demandée")
-                                    .catch(e => {console.log(e)})
+                                    .catch(e => { console.log(e) })
                                     .then(() => {
                                         // console.log("Role verification added")
                                     })
@@ -56,7 +58,7 @@ module.exports = class Verification{
 
                                 for (let k = 0; k < m.roles.cache.array().length; k++) {
                                     const e = m.roles.cache.array()[k];
-                                    if(e.id == VERIF || e.id == message.guild.id){ continue; }
+                                    if (e.id == VERIF || e.id == message.guild.id) { continue; }
 
                                     connection.query("INSERT INTO user_roles SET user = ?, server = ?, role = ?", [m.id, message.guild.id, e.id]);
 
@@ -107,24 +109,24 @@ module.exports = class Verification{
                             })
 
                         }
-                    }else{
+                    } else {
                         message.reply("Veuillez mentionner une ou plusieurs personnes à vérifier.")
                     }
                 }
             }
 
-            if(message.author.id == client.user.id){return;}
-            if(message.channel.type == "dm"){
+            if (message.author.id == client.user.id) { return; }
+            if (message.channel.type == "dm") {
                 message.channel.messages.fetch()
                     .then(messages => {
                         messages.forEach(el => {
-                            if(el.author.id == client.user.id){
+                            if (el.author.id == client.user.id) {
                                 el.delete();
                             }
                         })
                     })
                 message.channel.startTyping();
-                if(new RegExp("^[0-9]{8}$").test(message.content)){
+                if (new RegExp("^[0-9]{8}$").test(message.content)) {
                     // Le message est composé de 8 chiffres, on vérifie donc si il s'agit d'un étudiant
                     axios.get("http://annuaire.unice.fr/index.php?action=print_person&dn=uid%3D" + message.content + "%2Cou%3Detudiant%2Cou%3Dpeople%2Cdc%3Dunice%2Cdc%3Dfr&mode=ent&look=ent")
                         .then(response => {
@@ -134,12 +136,12 @@ module.exports = class Verification{
                             let notFound = false;
                             for (let i = 0; i < bolds.length; i++) {
                                 const element = bolds[i];
-                                if(element.innerHTML.startsWith("Pas de r&eacute;sultat")){
+                                if (element.innerHTML.startsWith("Pas de r&eacute;sultat")) {
                                     notFound = true;
                                 }
                             }
 
-                            if(notFound){
+                            if (notFound) {
                                 // On a trouvé personne avec ce numéro...
                                 message.channel.send("Numéro étudiant inconnu, veuillez réessayer.")
                                 message.channel.stopTyping();
@@ -154,12 +156,12 @@ module.exports = class Verification{
                             for (let k = 0; k < links.length; k++) {
                                 const el = links[k];
                                 let found = new RegExp(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/).test(el.innerHTML);
-                                if(found){
+                                if (found) {
                                     email = el.innerHTML;
                                 }
                             }
 
-                            if(email == null){
+                            if (email == null) {
                                 message.channel.send("Oops... Une erreur est survenue, contactez un administrateur\rRaison: UnkEml");
                                 message.channel.stopTyping();
                                 return;
@@ -193,30 +195,30 @@ module.exports = class Verification{
                             console.log(error);
                             message.channel.stopTyping();
                         });
-                }else if(new RegExp("^[0-9]{6}$").test(message.content)){
+                } else if (new RegExp("^[0-9]{6}$").test(message.content)) {
                     // Il s'aggit d'un code de vérification
 
                     // On recupère les codes et les utilisateurs
 
                     connection.query("SELECT * FROM verification_users WHERE discord = ?", [message.author.id], (err, res, fie) => {
 
-                        if(err != null || res.length == 0){
+                        if (err != null || res.length == 0) {
                             console.log(err);
                             message.channel.stopTyping();
                             return;
                         }
 
-                        if(message.content == res[0].code){
+                        if (message.content == res[0].code) {
 
                             let r = "";
-                            if(res[0].role == "teacher"){
+                            if (res[0].role == "teacher") {
                                 r = "Personnel de l'université"
-                            }else{
+                            } else {
                                 r = "Étudiant"
                             }
 
                             connection.query("SELECT * FROM verifications WHERE user = ?", [message.author.id], async (er, re, fi) => {
-                                if(er != null || re.length == 0){
+                                if (er != null || re.length == 0) {
                                     console.log(er);
                                     message.channel.stopTyping();
                                     return;
@@ -232,7 +234,7 @@ module.exports = class Verification{
                                             member.roles.remove(VERIF, "Vérification complétée, " + Buffer.from(res[0].name, 'base64').toString('utf-8'));
 
                                             connection.query("SELECT * FROM user_roles WHERE user = ? AND server = ?", [message.author.id, server], (e1, r1, f1) => {
-                                                if(e1 != null || r1.length == 0){
+                                                if (e1 != null || r1.length == 0) {
                                                     console.log(e1);
                                                     return;
                                                 }
@@ -253,7 +255,7 @@ module.exports = class Verification{
                                         guild.channels.cache.get(await Utils.get(server, "teacher_channel")).send('', {
                                             embed: {
                                                 title: "Vérification de " + message.author.username,
-                                                description: 'L\'utilisateur <@' + message.author.id + "> a complété le processus de vérification suite à votre demande.\n\nNous pouvons vous confirmer que cet utilisateur est un **"+r+"**.\nSuite à cette vérification, l'utilisateur dispose de nouveau des droits afin d'accéder à l'entièreté du serveur.",
+                                                description: 'L\'utilisateur <@' + message.author.id + "> a complété le processus de vérification suite à votre demande.\n\nNous pouvons vous confirmer que cet utilisateur est un **" + r + "**.\nSuite à cette vérification, l'utilisateur dispose de nouveau des droits afin d'accéder à l'entièreté du serveur.",
                                                 footer: {
                                                     text: client.user.username,
                                                     iconURL: client.user.avatarURL()
@@ -263,11 +265,11 @@ module.exports = class Verification{
                                                         name: "Numéro étudiant/Login",
                                                         value: Buffer.from(res[0].login, 'base64').toString('utf-8'),
                                                         inline: true,
-                                                    },{
+                                                    }, {
                                                         name: "Identité",
                                                         value: Buffer.from(res[0].name, 'base64').toString('utf-8'),
                                                         inline: true,
-                                                    },{
+                                                    }, {
                                                         name: "Email universitaire",
                                                         value: Buffer.from(res[0].email, 'base64').toString('utf-8')
                                                     }
@@ -301,7 +303,7 @@ module.exports = class Verification{
 
                             })
 
-                        }else{
+                        } else {
                             // NOPE
                             // Le code n'est pas correct
                             message.channel.send('', {
@@ -319,7 +321,7 @@ module.exports = class Verification{
 
                     })
 
-                }else{
+                } else {
 
                     // il s'agit d'un personnel de l'université
                     axios.get("http://annuaire.unice.fr/index.php?action=print_person&dn=uid%3D" + message.content + "%2Cou%3Dpersonnel%2Cou%3Dpeople%2Cdc%3Dunice%2Cdc%3Dfr&mode=ent&look=ent")
@@ -330,12 +332,12 @@ module.exports = class Verification{
                             let notFound = false;
                             for (let i = 0; i < bolds.length; i++) {
                                 const element = bolds[i];
-                                if(element.innerHTML.startsWith("Pas de r&eacute;sultat")){
+                                if (element.innerHTML.startsWith("Pas de r&eacute;sultat")) {
                                     notFound = true;
                                 }
                             }
 
-                            if(notFound){
+                            if (notFound) {
                                 // login non trouvée
                                 message.channel.send("Impossible de trouver cette identifiant, avez-vous rentré le bon ?")
                                 message.channel.stopTyping();
@@ -349,12 +351,12 @@ module.exports = class Verification{
                             for (let k = 0; k < links.length; k++) {
                                 const el = links[k];
                                 let found = new RegExp(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/).test(el.innerHTML);
-                                if(found){
+                                if (found) {
                                     email = el.innerHTML;
                                 }
                             }
 
-                            if(email == null){
+                            if (email == null) {
                                 message.channel.send("Oops... Une erreur est survenue, contactez un administrateur\rRaison: UnkEml");
                                 message.channel.stopTyping();
                                 return;
@@ -394,18 +396,18 @@ module.exports = class Verification{
 
     }
 
-    static generateCode(){
+    static generateCode() {
         let code = Math.floor(Math.random() * (999999 - 0) + 0);
         code = code.toString();
-        if(code.length < 6 && code.length != 0){
-            for(var i = code.length; i < 6; i++){
+        if (code.length < 6 && code.length != 0) {
+            for (var i = code.length; i < 6; i++) {
                 code = "0" + code;
             }
         }
         return code;
     }
 
-    static saveUser(userID, name, email, role, code, num){
+    static saveUser(userID, name, email, role, code, num) {
         connection.query("INSERT INTO verification_users SET ?", {
             discord: userID,
             name: Buffer.from(name, 'utf-8').toString('base64'),
@@ -416,13 +418,13 @@ module.exports = class Verification{
         });
     }
 
-    static removeUser(userID){
+    static removeUser(userID) {
         connection.query("DELETE FROM verification_users WHERE discord = ?", [userID]);
         connection.query("DELETE FROM verifications WHERE user = ?", [userID]);
         connection.query("DELETE FROM user_roles WHERE user = ?", [userID]);
     }
 
-    static async sendCodeEmail(email, code, client){
+    static async sendCodeEmail(email, code, client) {
         let transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             port: parseInt(process.env.EMAIL_PORT),

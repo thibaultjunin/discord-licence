@@ -1,26 +1,28 @@
 'use strict';
 // const GUILD = "747824621486866612"; // FIXME: Store it in db
 const sharp = require('sharp');
-const {Permissions} = require('discord.js');
+const { Permissions } = require('discord.js');
 const path = require('path');
 const ComplementaryColor = require('../Utils/ComplementaryColor');
 const Utils = require('../Utils/Utils');
 
-module.exports = class Logo{
-    static load(client){
+module.exports = class Logo {
+    static load(client) {
         setInterval(async () => {
             let now = new Date();
-            if(now.getHours() != 0 || now.getMinutes() != 0){
+            if (now.getHours() != 0 || now.getMinutes() != 0) {
                 return;
             }
-            
+
+            // it's midnights, update the client and guilds iconss
             Logo.updateIcon(client);
 
-        }, 60000);
+        }, 60000); // every minutes
 
         client.on('message', message => {
-            if(message.channel.type == "dm"){return;}
-            if(message.content.startsWith('!icon') && message.member.hasPermission(Permissions.FLAGS.MANAGE_GUILD)){
+            if (message.channel.type == "dm") { return; }
+            if (message.content.startsWith('!icon') && message.member.hasPermission(Permissions.FLAGS.MANAGE_GUILD)) {
+                // Force an icon update
                 Logo.updateIcon(client);
                 message.reply("Done").then(msg => {
                     msg.delete({
@@ -32,34 +34,36 @@ module.exports = class Logo{
         })
     }
 
-    static async updateIcon(client){
+    static async updateIcon(client) {
         let now = new Date();
 
         let addon = null;
-        if(now.getMonth() == 9){
+        // if today is a special day
+        if (now.getMonth() == 9) {
             // Halloween
             addon = "../Icons/citrouille.png"
-        }else if(now.getMonth() == 11 && (now.getDate() >= 10 && now.getDate() <= 28)){
+        } else if (now.getMonth() == 11 && (now.getDate() >= 10 && now.getDate() <= 28)) {
             // Noel
             addon = "../Icons/hiver.png"
-        }else if(now.getMonth() == 0 && now.getDate() <= 10){
+        } else if (now.getMonth() == 0 && now.getDate() <= 10) {
             // Nouvel an
             addon = "../Icons/nouvelan.png"
-        }else if(now.getMonth() == 1 && (now.getDate() >= 13 && now.getDate() <= 15)){
+        } else if (now.getMonth() == 1 && (now.getDate() >= 13 && now.getDate() <= 15)) {
             // St Valentin
             addon = "../Icons/ballonsCoeur.png"
-        }else if(now.getMonth() == 3){
+        } else if (now.getMonth() == 3) {
             // Paques
             addon = "../Icons/paques.png"
-        }else if(now.getMonth() == 6 || now.getMonth() == 7){
+        } else if (now.getMonth() == 6 || now.getMonth() == 7) {
             // Vacances
             addon = "../Icons/ete.png"
-        }else{
+        } else {
             addon = "../Icons/ordi.png"
         }
 
         addon = path.resolve(__dirname, addon)
 
+        // generating today's color, one random, one complemantry to the random one
         let complementary = new ComplementaryColor();
 
         let backgroundColor = Logo.getDayRGB();
@@ -83,7 +87,7 @@ module.exports = class Logo{
             }])
             .png()
             .toBuffer();
-        
+
         // Creating a 600x600px single color image to change the base icon's one
         let image = await sharp({
             create: {
@@ -104,6 +108,7 @@ module.exports = class Logo{
         let circle = await sharp(path.resolve(__dirname, '../Icons/circle.png'))
             .png()
             .toBuffer();
+
         // Creating a 600x600px single color image, to change circle.png color
         let circleColor = await sharp({
             create: {
@@ -119,7 +124,7 @@ module.exports = class Logo{
             }])
             .png()
             .toBuffer();
-            
+
 
         // Combining both images to make the final icon
         let finalIcon = await sharp(circleColor)
@@ -128,45 +133,44 @@ module.exports = class Logo{
             }])
             .png()
             .toBuffer();
-           
+
+        // List the guilds, and update the icon if configured to do so.
         const guilds = client.guilds.cache.array();
         for (let index = 0; index < guilds.length; index++) {
             const element = guilds[index];
-            
+
             Utils.get(element.id, "change_icon").then(v => {
-                if(v){
+                if (v) {
                     element.setIcon(finalIcon)
                         .catch(ex1 => console.error("Set Icon", ex1))
                 }
             })
 
         }
-        // client.guilds.fetch(GUILD).then(g => {
-        //     g.setIcon(finalIcon).catch(ex1 => console.error("Set Icon", ex1))
-        //     console.log("changed");
-        // }).catch(ex2 => console.error("Fetch Guild", ex2))
+        // Update the bot's avatar
         client.user.setAvatar(finalIcon).catch(ex3 => console.error("Avatar", ex3));
     }
 
-    static getDayRGB(){
+    static getDayRGB() {
+        // Generating an RGB object base on today's date.
         var now = new Date();
         var start = new Date(now.getFullYear(), 0, 0);
         var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
         var oneDay = 1000 * 60 * 60 * 24;
         var day = Math.floor(diff / oneDay);
 
-        if(day < 256){
+        if (day < 256) {
             return {
                 r: Math.floor(Math.random() * Math.floor(day)),
                 g: Math.floor(Math.random() * Math.floor(255)), // Random is always fun
                 b: Math.floor(Math.random() * Math.floor(day)),
             }
-        }else{
+        } else {
 
             return {
-                r: Math.floor(Math.random() * Math.floor(365-day)),
+                r: Math.floor(Math.random() * Math.floor(365 - day)),
                 g: Math.floor(Math.random() * Math.floor(255)), // Random is a lot of fun
-                b: Math.floor(Math.random() * Math.floor(day%365)),
+                b: Math.floor(Math.random() * Math.floor(day % 365)),
             }
 
         }

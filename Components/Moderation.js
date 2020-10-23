@@ -1,12 +1,13 @@
 'use strict';
-const {Permissions} = require('discord.js');
+const { Permissions } = require('discord.js');
 const utils = require('../Utils/Utils');
 
 module.exports = class Moderation {
 
     static load(client) {
         client.on('message', async (message) => {
-            if(message.channel.type == "dm"){return;}
+            if (message.channel.type == "dm") { return; }
+            // Warning a user
             if (message.content.startsWith('!warn') && message.member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) {
                 const m_array = message.mentions.members.array();
                 const warn_role = await utils.get(message.guild.id, "avertissement");
@@ -16,10 +17,11 @@ module.exports = class Moderation {
 
                     let m = await element.fetch(true);
 
-                    console.log(warn_role);
-
+                    // Adding a "Warn" role to the user.
                     m.roles.add(warn_role, "Avertissement suite à un comportement non acceptable")
-                        .catch(e => {console.error(e)});
+                        .catch(e => { console.error(e) });
+
+                    // sending a dm to inform the warned user
                     m.createDM()
                         .then(channel => {
                             channel.startTyping();
@@ -33,15 +35,16 @@ module.exports = class Moderation {
                                     }
                                 }
                             })
-                            .catch(e => {
-                                console.error(e);
-                            })
+                                .catch(e => {
+                                    console.error(e);
+                                })
                             channel.stopTyping();
                         }).catch(err => {
                             console.error(err);
                         });
                 }
             }
+            // If the user is muted, delete his message.
             if (message.member.roles.cache.has(await utils.get(message.guild.id, "Muet"))) {
                 message.delete();
             }

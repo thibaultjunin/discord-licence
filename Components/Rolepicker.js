@@ -1,29 +1,29 @@
 'use strict';
-const {Permissions, MessageEmbed} = require('discord.js');
+const { Permissions, MessageEmbed } = require('discord.js');
 const { v4: uuidv4 } = require('uuid');
 const Utils = require('../Utils/Utils');
 var connection = Utils.getConnection();
 
-module.exports = class RolePicker{
+module.exports = class RolePicker {
 
-    static load(client){
+    static load(client) {
         client.on('messageReactionAdd', async (reaction, user) => {
             if (reaction.partial) {
                 await reaction.fetch();
             }
-            if(user.id == client.user.id){ return; }
-            // // Ajout du role
+            if (user.id == client.user.id) { return; }
+            // Adding the request role
             connection.query('SELECT uuid FROM pickers WHERE channel_id = ?', [reaction.message.channel.id], (err, res, fie) => {
-                if(err != null || res.length == 0){
+                if (err != null || res.length == 0) {
                     console.log(err);
                     return;
                 }
 
                 let emote = null;
-                if(reaction.emoji.id == null){
+                if (reaction.emoji.id == null) {
                     // global emote
                     emote = reaction.emoji.name
-                }else{
+                } else {
                     // custom emote
                     emote = reaction.emoji.id
                 }
@@ -32,22 +32,22 @@ module.exports = class RolePicker{
                 let guild = channel.guild;
 
                 connection.query('SELECT * FROM picker_roles WHERE picker = ?', [res[0].uuid], (error, results, fields) => {
-                    if(error != null || results.length == 0){
+                    if (error != null || results.length == 0) {
                         console.log(error);
                         return;
                     }
 
                     for (let i = 0; i < results.length; i++) {
                         const el = results[i];
-                        if(Buffer.from(el.emote, 'base64').toString('utf-8') == emote){
-                            let roleID  = el.role;
+                        if (Buffer.from(el.emote, 'base64').toString('utf-8') == emote) {
+                            let roleID = el.role;
                             guild.members.fetch(user.id).then(member => {
                                 member.roles.add(roleID, "L'utilisateur a demandé le role " + Buffer.from(el.title, 'base64').toString('utf-8'))
                                     .catch(e => {
                                         console.log(e)
                                     });
                             })
-                            
+
                         }
                     }
 
@@ -59,19 +59,19 @@ module.exports = class RolePicker{
             if (reaction.partial) {
                 await reaction.fetch();
             }
-            if(user.id == client.user.id){ return; }
-            // Suppression du role
+            if (user.id == client.user.id) { return; }
+            // Removing the requested role
             connection.query('SELECT uuid FROM pickers WHERE channel_id = ?', [reaction.message.channel.id], (err, res, fie) => {
-                if(err != null || res.length == 0){
+                if (err != null || res.length == 0) {
                     console.log(error);
                     return;
                 }
 
                 let emote = null;
-                if(reaction.emoji.id == null){
+                if (reaction.emoji.id == null) {
                     // global emote
                     emote = reaction.emoji.name
-                }else{
+                } else {
                     // custom emote
                     emote = reaction.emoji.id
                 }
@@ -80,22 +80,22 @@ module.exports = class RolePicker{
                 let guild = channel.guild;
 
                 connection.query('SELECT * FROM picker_roles WHERE picker = ?', [res[0].uuid], (error, results, fields) => {
-                    if(error != null || results.length == 0){
+                    if (error != null || results.length == 0) {
                         console.log(error);
                         return;
                     }
 
                     for (let i = 0; i < results.length; i++) {
                         const el = results[i];
-                        if(Buffer.from(el.emote, 'base64').toString('utf-8') == emote){
-                            let roleID  = el.role;
+                        if (Buffer.from(el.emote, 'base64').toString('utf-8') == emote) {
+                            let roleID = el.role;
                             guild.members.fetch(user.id).then(member => {
                                 member.roles.remove(roleID, "L'utilisateur ne veux plus le role " + Buffer.from(el.title, 'base64').toString('utf-8'))
                                     .catch(e => {
                                         console.log(e)
                                     });
                             })
-                            
+
                         }
                     }
 
@@ -105,18 +105,18 @@ module.exports = class RolePicker{
         })
 
         client.on('message', (message) => {
-            if(message.channel.type == "dm"){return;}
-            if(!message.content.startsWith("!")){
+            if (message.channel.type == "dm") { return; }
+            if (!message.content.startsWith("!")) {
                 return;
             }
 
-            if(message.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)){
-                if(message.content.startsWith("!picker")){
+            if (message.member.hasPermission(Permissions.FLAGS.MANAGE_ROLES)) {
+                if (message.content.startsWith("!picker")) {
 
                     let args = message.content.split(" ");
                     args.shift();
 
-                    if(args.length < 1){
+                    if (args.length < 1) {
                         message.reply("Utilisation: !picker Titre").then(msg => {
                             msg.delete({
                                 timeout: 3000
@@ -129,13 +129,13 @@ module.exports = class RolePicker{
                     let title = args.join(" ");
 
                     connection.query("SELECT uuid FROM pickers WHERE channel_id = ?", [message.channel.id], (err, res, fi) => {
-                        if(err != null){
+                        if (err != null) {
                             console.error(err);
                             return;
                         }
 
-                        if(res.length == 0){
-                            // Create
+                        if (res.length == 0) {
+                            // Creating a new picker
                             connection.query('INSERT INTO pickers SET uuid = ?, name = ?, channel_id = ?', [
                                 uuidv4(),
                                 Buffer.from(title, 'utf-8').toString('base64'),
@@ -144,8 +144,8 @@ module.exports = class RolePicker{
                                 console.log(e1, r1)
                                 RolePicker.updateOrSendMessage(message, client);
                             });
-                        }else{
-                            // Update
+                        } else {
+                            // Updating the existing picker
                             connection.query('UPDATE pickers SET name = ? WHERE channel_id = ?', [
                                 Buffer.from(title, 'utf-8').toString('base64'),
                                 message.channel.id
@@ -159,12 +159,12 @@ module.exports = class RolePicker{
 
                     message.delete();
                 }
-                if(message.content.startsWith("!role")){
+                if (message.content.startsWith("!role")) {
                     // !role <@role> <Emoji> <Titre>
                     let args = message.content.split(" ");
                     args.shift();
 
-                    if(args.length < 3){
+                    if (args.length < 3) {
                         message.reply("Utilisation: !role \@role \:emoji\: Titre").then(msg => {
                             msg.delete({
                                 timeout: 3000
@@ -185,13 +185,13 @@ module.exports = class RolePicker{
                     role = role.replace("<@&", "");
                     role = role.replace(">", "");
 
-                    if(emote.includes("<")){
+                    if (emote.includes("<")) {
                         emote = emote.split(":");
                         emote = emote[2];
                         emote = emote.replace(">", "")
 
                         emote = message.guild.emojis.resolve(emote)
-                        if(emote == null){
+                        if (emote == null) {
                             message.reply("Veuillez utiliser un emoji venant de ce serveur discord.").then(msg => {
                                 msg.delete({
                                     timeout: 3000
@@ -204,7 +204,7 @@ module.exports = class RolePicker{
                     }
 
                     connection.query("SELECT uuid FROM pickers WHERE channel_id = ?", [message.channel.id], (err, res, fi) => {
-                        if(err != null || res.length == 0){
+                        if (err != null || res.length == 0) {
                             console.error(err);
                             return;
                         }
@@ -229,32 +229,32 @@ module.exports = class RolePicker{
         })
     }
 
-    static updateOrSendMessage(message, client){
+    static updateOrSendMessage(message, client) {
         message.channel.messages.fetch()
             .then(async (messages) => {
                 let hasPicker = false;
                 let pickerMessage = null;
                 messages.forEach(el => {
-                    if(el.author.id == client.user.id && (!el.content.includes("!picker") || !el.content.includes("!role"))){
+                    if (el.author.id == client.user.id && (!el.content.includes("!picker") || !el.content.includes("!role"))) {
                         pickerMessage = el;
                         hasPicker = true;
-                    }   
+                    }
                 })
-                if(hasPicker){
+                if (hasPicker) {
                     // Edit
                     let em = await RolePicker.getPickerEmbed(client, message.channel);
                     pickerMessage.edit(em)
-                        .then(msg => {RolePicker.updateReactions(msg)})
-                }else{
+                        .then(msg => { RolePicker.updateReactions(msg) })
+                } else {
                     // Add
                     let em = await RolePicker.getPickerEmbed(client, message.channel)
                     message.channel.send(em)
-                        .then(msg => {RolePicker.updateReactions(msg)})
+                        .then(msg => { RolePicker.updateReactions(msg) })
                 }
             })
     }
 
-    static getPickerEmbed(client, channel){
+    static getPickerEmbed(client, channel) {
         return new Promise((resolve) => {
             let embed = new MessageEmbed();
 
@@ -262,7 +262,7 @@ module.exports = class RolePicker{
             embed.setAuthor(client.user.username, client.user.avatarURL());
 
             connection.query('SELECT * FROM pickers WHERE channel_id = ?', [channel.id], (err, results, fields) => {
-                if(err != null || results.length == 0){
+                if (err != null || results.length == 0) {
                     console.error("Error ", err);
                     return;
                 }
@@ -270,19 +270,19 @@ module.exports = class RolePicker{
                 let em = results[0];
                 embed.setTitle(Buffer.from(em.name, 'base64').toString('utf-8'));
 
-                connection.query('SELECT * FROM picker_roles WHERE picker = ?', [em.uuid], (error, result, f) => {  
-                    if(error != null){
+                connection.query('SELECT * FROM picker_roles WHERE picker = ?', [em.uuid], (error, result, f) => {
+                    if (error != null) {
                         console.error(error);
-                        return; 
+                        return;
                     }
 
-                    if(result.length > 0){
+                    if (result.length > 0) {
                         // Add the differents roles
                         result.forEach(role => {
                             let str = null;
-                            if(!(new RegExp("^[0-9]+$").test(Buffer.from(role.emote, 'base64').toString('utf-8')))){
+                            if (!(new RegExp("^[0-9]+$").test(Buffer.from(role.emote, 'base64').toString('utf-8')))) {
                                 str = Buffer.from(role.emote, 'base64').toString('utf-8').replace("@", "");
-                            }else{
+                            } else {
                                 let emote = channel.guild.emojis.resolve(Buffer.from(role.emote, 'base64').toString('utf-8'))
                                 str = "<:" + emote.name + ":" + emote.id + ">";
                             }
@@ -292,57 +292,58 @@ module.exports = class RolePicker{
 
                     resolve(embed);
                 })
-            })            
+            })
         });
     }
 
-    static updateReactions(message){
+    static updateReactions(message) {
         connection.query('SELECT uuid FROM pickers WHERE channel_id = ?', [message.channel.id], (err, results, fields) => {
-            if(err != null || results.length == 0){
+            if (err != null || results.length == 0) {
                 console.error(err);
                 return;
             }
 
             let uuid = results[0].uuid;
-            
-            connection.query('SELECT * FROM picker_roles WHERE picker = ?', [uuid], (error, result, f) => {  
-                if(error != null || result.length == 0){
+
+            connection.query('SELECT * FROM picker_roles WHERE picker = ?', [uuid], (error, result, f) => {
+                if (error != null || result.length == 0) {
                     console.error(error);
-                    return; 
+                    return;
                 }
 
                 result.forEach(role => {
 
                     let testAgainst = null;
-                    if(new RegExp("^[0-9]+$").test(Buffer.from(role.emote, 'base64').toString('utf-8'))){
-                        // C'est une emote custom
+                    if (new RegExp("^[0-9]+$").test(Buffer.from(role.emote, 'base64').toString('utf-8'))) {
+                        // This is a custom emote
                         let emote = message.channel.guild.emojis.resolve(Buffer.from(role.emote, 'base64').toString('utf-8'))
                         testAgainst = emote.id;
-                    }else{
-                        // C'est pas une emote custom
+                    } else {
+                        // This is a global emote
                         testAgainst = Buffer.from(role.emote, 'base64').toString('utf-8').replace('@', '');
                     }
-    
+
                     let has = false;
-                    
+
                     message.reactions.cache.forEach(reac => {
-                        if(reac.id == null){
-                            // Emoji global
-                            if(reac._emoji.name == testAgainst){
+                        if (reac.id == null) {
+                            // global emoji
+                            if (reac._emoji.name == testAgainst) {
                                 has = true;
                             }
-                        }else{
-                            // Emoji custom
-                            if(reac.id == testAgainst){
+                        } else {
+                            // custom emoji
+                            if (reac.id == testAgainst) {
                                 has = true;
                             }
                         }
                     });
-                    
-                    if(!has){
+
+                    if (!has) {
+                        // If the picker doesn't have a role emoji, add it.
                         message.react(testAgainst)
                     }
-    
+
                 })
             });
 
