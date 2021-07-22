@@ -5,7 +5,7 @@ from discord_slash import SlashCommand
 import logging
 import sys
 import os
-
+from src.constants import BOT
 from typing import Optional
 
 logger = logging.getLogger("licence")
@@ -51,7 +51,7 @@ class Licence(commands.AutoShardedBot):
 
     def run(self, *args, **kwargs):
         try:
-            super().run("", *args, **kwargs)
+            super().run(BOT, *args, **kwargs)
         except KeyboardInterrupt:
             self._exit()
 
