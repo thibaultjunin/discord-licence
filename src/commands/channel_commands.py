@@ -13,8 +13,6 @@ Add a new group of channel.
 -- A voice channel called "general"
 -- An announcement channel called "annonces-title"
 """
-
-
 async def addChannelGroup(bot: Licence, ctx: Union[SlashContext, commands.Context], year, title):
     guild = ctx.guild
 
@@ -37,7 +35,8 @@ async def addChannelGroup(bot: Licence, ctx: Union[SlashContext, commands.Contex
         f"{year} - {title}",
         overwrites={
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            role: discord.PermissionOverwrite(view_channel=False),
+            role: discord.PermissionOverwrite(view_channel=True),
+            # TODO: Add teacher's role
         },
         reason="Ajout d'un nouveau cours."
     )
@@ -45,16 +44,26 @@ async def addChannelGroup(bot: Licence, ctx: Union[SlashContext, commands.Contex
     # Adding a new announcement channel
     news = await guild.create_text_channel(
         f"annonces-{title}",
-        overwrites={
-            guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            role: discord.PermissionOverwrite(view_channel=False),
-        },
         reason="Ajout d'un nouveau cours.",
         category=category,
     )
 
     await news.edit(
         type=discord.ChannelType.news
+    )
+
+    # Adding a text channel
+    await guild.create_text_channel(
+        title,
+        reason="Ajout d'un nouveau cours.",
+        category=category,
+    )
+
+    # Adding a voice channel
+    await guild.create_voice_channel(
+        "general",
+        reason="Ajout d'un nouveau cours.",
+        category=category,
     )
 
     await ctx.send("Et voilà! Nouveau cours ajouté.")
