@@ -1,3 +1,6 @@
-node_modules
+.idea
+*.iml
+.DS_Store
+licence.log
 .env
-test_crosspost_discord.js
+__pycache__
