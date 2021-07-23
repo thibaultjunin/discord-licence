@@ -1,3 +1,5 @@
+> **The group of people who originally created this bot are no longer undergraduates, and for some no longer at University Côte d'Azur. That's why we need you to maintain this bot and make sure it keeps working for years to come. We count on you.**
+
 # Licence Informatique@UCA Discord Bot 🥳
 
 <img src="https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png" align="right" alt="Licence Informatique@UCA Discord Bot" width="200" height="200">
@@ -25,6 +27,3 @@ Use the `/cours` command to create a new category with:
 1. Copy the `.env.example` to `.env` and fill in the appropriate values
 1. Run `main.py`
 
-## Contribute
-
-> **The group of people who originally created this bot are no longer undergraduates, and for some no longer at University Côte d'Azur. That's why we need you to maintain this bot and make sure it keeps working for years to come. We count on you.**
