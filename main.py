@@ -32,7 +32,7 @@ class Licence(commands.AutoShardedBot):
                 name="Starting..."
             ),
             status=discord.Status.dnd,
-            command_prefix="♫",
+            command_prefix="uca",
             intents=intents
         )
         self.slash = SlashCommand(
@@ -40,6 +40,7 @@ class Licence(commands.AutoShardedBot):
             sync_commands=True,
             sync_on_cog_reload=True
         )
+        self._color = 0x007fa3
         self.load_cogs()
 
     def _exit(self):
@@ -59,6 +60,10 @@ class Licence(commands.AutoShardedBot):
         except KeyboardInterrupt:
             self._exit()
 
+    @property
+    def color(self):
+        return self._color
+
     async def on_member_join(self, member):
         if member.dm_channel is None:
             await member.create_dm()
@@ -66,7 +71,7 @@ class Licence(commands.AutoShardedBot):
         channel = member.dm_channel
 
         embed = discord.Embed(
-            color=0x007fa3,
+            color=self.color,
             description="Bienvenue sur le discord **Licence Informatique@UCA** ce lieu a pour vocation d'être ta place de communication avec les autres étudiants et les professeurs durant ta licence.\n\nCe serveur est gérer par des étudiants et il se doit de rester un espace propre, pour cela, nous avons mis en places quelques règles que tu retrouveras dans <#743452204207439913>.\n\nN’oublie pas de choisir également un rôle pour avoir accès à tes cours dans <#748152325654446110>.\n\n**Un petit mot sur moi :** Mes créateurs, ne sont plus en licence et pour certains plus à l’université. C’est pour cela qu’ils ont besoin de toi afin que tu me maintiennes et que je continue à fonctionner pour tous les étudiants, je suis fait en Python et tu vas voir c’est simple, tout ce passe sur github : [https://github.com/thibaultjunin/discord-licence](https://github.com/thibaultjunin/discord-licence)\n**On compte sur toi !**",
             timestamp=dt.datetime.utcnow()
         )
