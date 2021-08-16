@@ -5,8 +5,9 @@ from discord_slash import SlashCommand
 import logging
 import sys
 import os
+from src.database import DB
 from src.constants import BOT
-from typing import Optional
+from typing import Optional, Union
 import datetime as dt
 
 logger = logging.getLogger("licence")
@@ -22,10 +23,11 @@ handler.setFormatter(logging.Formatter(
 logger.addHandler(handler)
 
 
-class Licence(commands.AutoShardedBot):
+class Licence(commands.AutoShardedBot, DB):
     def __init__(self, *args, **kwargs):
         intents = discord.Intents.default()
         intents.members = True
+        intents.reactions = True
 
         super().__init__(
             activity=discord.Game(
@@ -40,6 +42,7 @@ class Licence(commands.AutoShardedBot):
             sync_commands=True,
             sync_on_cog_reload=True
         )
+        super(DB, self).__init__()
         self._color = 0x007fa3
         self.load_cogs()
 
@@ -101,11 +104,59 @@ class Licence(commands.AutoShardedBot):
                 logger.exception(f"Fail to load {file}")
 
     async def on_ready(self):
+        await self.init()
         await self.change_presence(
             activity=None,
             status=discord.Status.online
         )
         logger.info("Licence ready")
+
+    # async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+
+    #     # message: discord.Message = self.fetch_channel(
+    #     guild: discord.Guild = self.fetch_guild(payload.guild_id)
+    #     if reaction.custom_emoji:
+    #         role_id = await self.get_role_id(guild.id, reaction.emoji.id, message.id)
+    #     else:
+    #         role_id = await self.get_role_id(guild.id, str(reaction), message.id)
+    #     if role_id is None:
+    #         return
+    #     role: discord.Role = guild.get_role(role_id)
+    #     if role in user.roles:
+    #         return
+    #     await user.add_roles(role, reason=f"Reaction ajouté sur le message {reaction.message.id}")
+    #     logger.info(f"Le role {role.name} a été ajouté a l'utilisateur {user}")
+
+    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]):
+        print(reaction)
+        message: discord.Message = reaction.message
+        guild: discord.Guild = message.guild
+        if reaction.custom_emoji:
+            role_id = await self.get_role_id(guild.id, reaction.emoji.id, message.id)
+        else:
+            role_id = await self.get_role_id(guild.id, str(reaction), message.id)
+        if role_id is None:
+            return
+        role: discord.Role = guild.get_role(role_id)
+        if role in user.roles:
+            return
+        await user.add_roles(role, reason=f"Reaction ajouté sur le message {reaction.message.id}")
+        logger.info(f"Le role {role.name} a été ajouté a l'utilisateur {user}")
+
+    async def on_reaction_remove(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]):
+        message: discord.Message = reaction.message
+        guild: discord.Guild = message.guild
+        if reaction.custom_emoji:
+            role_id = await self.get_role_id(guild.id, reaction.emoji.id, message.id)
+        else:
+            role_id = await self.get_role_id(guild.id, str(reaction), message.id)
+        if role_id is None:
+            return
+        role: discord.Role = guild.get_role(role_id)
+        if role in user.roles:
+            return
+        await user.remove_roles(role, reason=f"Reaction enlevé sur le message {reaction.message.id}")
+        logger.info(f"Le role {role.name} a été supprimé a l'utilisateur {user}")
 
 
 if __name__ == "__main__":
