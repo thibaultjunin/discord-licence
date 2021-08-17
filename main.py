@@ -7,7 +7,7 @@ import sys
 import os
 from src.database import DB
 from src.constants import BOT
-from typing import Optional, Union
+from typing import Optional
 import datetime as dt
 
 logger = logging.getLogger("licence")
@@ -27,7 +27,6 @@ class Licence(commands.AutoShardedBot, DB):
     def __init__(self, *args, **kwargs):
         intents = discord.Intents.default()
         intents.members = True
-        intents.reactions = True
 
         super().__init__(
             activity=discord.Game(
@@ -44,6 +43,8 @@ class Licence(commands.AutoShardedBot, DB):
         )
         super(DB, self).__init__()
         self._color = 0x007fa3
+        self._footer_text = "Licence Informatique@UCA"
+        self._icon_url = "https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png"
         self.load_cogs()
 
     def _exit(self):
@@ -80,13 +81,12 @@ class Licence(commands.AutoShardedBot, DB):
         )
         embed.set_author(
             name="Bienvenue sur le discord de la licence informatique à l'Université Côte d'Azur !",
-            icon_url="https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png"
+            icon_url=self.icon_url
         )
-        embed.set_thumbnail(
-            url="https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png")
+        embed.set_thumbnail(url=self.icon_url)
         embed.set_footer(
-            text="Licence Informatique@UCA",
-            icon_url="https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png"
+            text=self.footer_text,
+            icon_url=self.icon_url
         )
 
         await channel.send(embed=embed)
@@ -111,52 +111,66 @@ class Licence(commands.AutoShardedBot, DB):
         )
         logger.info("Licence ready")
 
-    # async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+    @property
+    def footer_text(self):
+        return self._footer_text
 
-    #     # message: discord.Message = self.fetch_channel(
-    #     guild: discord.Guild = self.fetch_guild(payload.guild_id)
-    #     if reaction.custom_emoji:
-    #         role_id = await self.get_role_id(guild.id, reaction.emoji.id, message.id)
-    #     else:
-    #         role_id = await self.get_role_id(guild.id, str(reaction), message.id)
-    #     if role_id is None:
-    #         return
-    #     role: discord.Role = guild.get_role(role_id)
-    #     if role in user.roles:
-    #         return
-    #     await user.add_roles(role, reason=f"Reaction ajouté sur le message {reaction.message.id}")
-    #     logger.info(f"Le role {role.name} a été ajouté a l'utilisateur {user}")
+    @property
+    def icon_url(self):
+        return self._icon_url
 
-    async def on_reaction_add(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]):
-        print(reaction)
-        message: discord.Message = reaction.message
-        guild: discord.Guild = message.guild
-        if reaction.custom_emoji:
-            role_id = await self.get_role_id(guild.id, reaction.emoji.id, message.id)
+    # async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
+    #     logger.error(error, exc_info=True)
+    #     if isinstance(error, commands.CommandNotFound):
+    #         return await ctx.send("Cette commande n'existe pas.")
+    #         # Handling Command Not Found Errors
+
+    #     # raise error
+    #     embed = discord.Embed(
+    #         title="Error",
+    #         description=error,
+    #         timestamp=dt.datetime.utcnow(),
+    #         color=self.color
+    #     )
+    #     await ctx.send(embed=embed)
+
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        print(payload)
+        guild = await self.fetch_guild(payload.guild_id)
+        user: discord.Member = await guild.fetch_member(payload.user_id)
+        if user.bot:
+            return
+
+        if payload.emoji.is_custom_emoji():
+            role_id = await self.get_role_id(guild.id, payload.emoji.id, payload.message_id)
         else:
-            role_id = await self.get_role_id(guild.id, str(reaction), message.id)
+            role_id = await self.get_role_id_by_emoji_name(guild.id, str(payload.emoji.name), payload.message_id)
         if role_id is None:
+            logger.info(f"{user} a ajouté une réaction inconnu au message.")
             return
         role: discord.Role = guild.get_role(role_id)
         if role in user.roles:
             return
-        await user.add_roles(role, reason=f"Reaction ajouté sur le message {reaction.message.id}")
-        logger.info(f"Le role {role.name} a été ajouté a l'utilisateur {user}")
+        await user.add_roles(role)
+        logger.info(f"Le role {role.name} a été ajouté de l'utilisateur {user}")
 
-    async def on_reaction_remove(self, reaction: discord.Reaction, user: Union[discord.Member, discord.User]):
-        message: discord.Message = reaction.message
-        guild: discord.Guild = message.guild
-        if reaction.custom_emoji:
-            role_id = await self.get_role_id(guild.id, reaction.emoji.id, message.id)
+    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
+        print(payload)
+        guild = await self.fetch_guild(payload.guild_id)
+        user: discord.Member = await guild.fetch_member(payload.user_id)
+        if user.bot:
+            return
+
+        if payload.emoji.is_custom_emoji():
+            role_id = await self.get_role_id(guild.id, payload.emoji.id, payload.message_id)
         else:
-            role_id = await self.get_role_id(guild.id, str(reaction), message.id)
+            role_id = await self.get_role_id_by_emoji_name(guild.id, str(payload.emoji.name), payload.message_id)
         if role_id is None:
             return
         role: discord.Role = guild.get_role(role_id)
-        if role in user.roles:
-            return
-        await user.remove_roles(role, reason=f"Reaction enlevé sur le message {reaction.message.id}")
-        logger.info(f"Le role {role.name} a été supprimé a l'utilisateur {user}")
+
+        await user.remove_roles(role)
+        logger.info(f"Le role {role.name} a été supprimé de l'utilisateur {user}")
 
 
 if __name__ == "__main__":

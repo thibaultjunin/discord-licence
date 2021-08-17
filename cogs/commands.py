@@ -19,29 +19,30 @@ class Commands(commands.Cog):
     async def _lessons(self, ctx: commands.Context, year: str, title: str):
         await botCommands.addChannelGroup(self.bot, ctx, year, title)
 
-
     @commands.command(name="embed")
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
     async def _embed(self, ctx: commands.Context, *, embed_title: str):
         await botCommands.embed_command(self.bot, ctx, embed_title)
 
+    @commands.command(name="embedupdate")
+    @commands.has_permissions(administrator=True)
+    @commands.guild_only()
+    async def _embed_update(self, ctx: commands.Context, update_type, channel: discord.TextChannel, message_id: str, *, content: str):
+        await botCommands.embed_update_command(self.bot, ctx, update_type, channel, int(message_id), content)
+
     @commands.command(name="reactrole")
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
-    async def _react_role(self, ctx: commands.Context, channel: discord.TextChannel, message_id: str, role: discord.Role):
-        await botCommands.react_role_command(self.bot, ctx, channel, int(message_id), role)
+    async def _react_role(self, ctx: commands.Context, channel: discord.TextChannel, message_id: str, role: discord.Role, *, role_description: str):
+        await botCommands.react_role_command(self.bot, ctx, channel, int(message_id), role, role_description)
 
-    @commands.command(name="test")
+    @commands.command(name="removereact")
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
-    async def _test(self, ctx, message_id):
-        await ctx.send(await self.bot.get_guild_id(message_id))
+    async def _remove_react_role(self, ctx: commands.Context, channel: discord.TextChannel, message_id: str, emoji: str):
+        await botCommands.remove_react_role_command(self.bot, ctx, channel, int(message_id), emoji)
 
-    # @commands.command(name="addreact")
-    # @commands.has_permissions(administrator=True)
-    # @commands.guild_only()
-    # async def _add_react(self, ctx: commands.Context,
 
 def setup(bot):
     bot.add_cog(Commands(bot))
