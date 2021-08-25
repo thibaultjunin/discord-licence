@@ -105,3 +105,10 @@ class DB:
                 self.rpicker_tbl.c.channel_id == channel_id,
                 self.rpicker_tbl.c.emoji == str(reaction)
             )))
+
+    async def delete_message(self, guild_id, message_id):
+        async with self.engine.acquire() as conn:
+            await conn.execute(self.rpicker_tbl.delete().where(sa.and_(
+                self.rpicker_tbl.c.guild_id == guild_id,
+                self.rpicker_tbl.c.message_id == message_id
+            )))

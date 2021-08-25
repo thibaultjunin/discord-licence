@@ -29,9 +29,9 @@ async def embed_command(bot: Licence, ctx: Union[SlashContext, commands.Context]
     if not isinstance(ctx, (SlashContext, commands.Context)):
         raise TypeError(
             f"Expected a {SlashContext.__name__} or {commands.Context.__name__}, got {type(ctx)}.")
-
+    description = "Message id : `{0}`\n\nEn attente d'ajout de réactions avec la commande\n`ucareact_role #{1} {0} @role Description` <a:loading:880061819002171432>"
     embed = discord.Embed(
-        description="En attente d'ajout de réactions avec la commande\n`ucareactrole <#channel> <message_id> <@role> <role_description>` ...",
+        description=description,
         color=bot.color,
         timestamp=dt.datetime.utcnow()
     )
@@ -44,13 +44,32 @@ async def embed_command(bot: Licence, ctx: Union[SlashContext, commands.Context]
         icon_url=bot.icon_url
     )
 
-    await ctx.send(embed=embed)
+    message = await ctx.send(embed=embed)
+    description = description.format(message.id, message.channel)
+    embed.description = description
+    await message.edit(embed=embed)
 
 
 async def embed_update_command(bot: Licence, ctx: Union[SlashContext, commands.Context], update_type: str, channel: discord.TextChannel, message_id: int, content: str):
+    r"""
+    Parameters
+    ----------
+    `bot` :Licence
+        The bot's licence.
+    `ctx` :Union[SlashContext, commands.Context]
+        The context in which the command was used.
+    `update_type` : str
+        The type of update.
+    `channel` : discord.TextChannel
+        The channel where the message is in.
+    `message_id` : str
+        The message id.
+    `content` : str
+        The content of the message.
+    """
     message: discord.Message = await channel.fetch_message(message_id)
     embed = util.get_embed(message)
-    print(embed.author.name)
+
 
     if update_type == "title":
         embed.set_author(
@@ -60,7 +79,6 @@ async def embed_update_command(bot: Licence, ctx: Union[SlashContext, commands.C
     elif update_type == "description":
         embed.description = content
     elif update_type == "footer":
-        embed.footer = content
         embed.set_footer(
             text=content,
             icon_url=bot.icon_url
@@ -68,7 +86,6 @@ async def embed_update_command(bot: Licence, ctx: Union[SlashContext, commands.C
     else:
         return await ctx.send("Rien n'a changé")
 
-    print(embed.author.name)
     await message.edit(embed=embed)
 
 
@@ -109,7 +126,7 @@ async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Con
         raise EmbedNotFoundException("L'embed n'a pas pu être retrouvé")
 
     try:
-        message_wait_reaction = await ctx.send("Ajoutez la réaction voulut sous ce message, vous avez 10 minutes pour y réagir.")
+        message_wait_reaction = await ctx.send("Ajoutez la réaction voulue sous ce message, vous avez 10 minutes pour y réagir.")
 
         def check(reaction, user):
             return reaction.message.id == message_wait_reaction.id and user == ctx.author
@@ -118,7 +135,7 @@ async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Con
         if reaction in message_specified.reactions:
             return await ctx.send("Cette réaction à déjà été ajouté au message")
         await bot.insert_role(ctx.guild.id, message_specified.id, channel.id, reaction, role.id)
-        if embed.description.startswith("En attente"):
+        if embed.description.startswith("Message id :"):
             embed.description = f"{reaction} - {role_description}"
         else:
             embed.description = f"{embed.description}\n{reaction} - {role_description}"
@@ -133,7 +150,24 @@ async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Con
 
 async def remove_react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Context], channel: discord.TextChannel, message_id: int, emoji: str):
     r"""
-
+    Parameters
+    ----------
+    `bot` :Licence
+        The bot's licence.
+    `ctx` :Union[SlashContext, commands.Context]
+        The context in which the command was used.
+    `channel` : discord.TextChannel
+        The channel where the message is in.
+    `message_id` : str
+        The message id.
+    `emoji` : str
+        The emoji that will be removed from the message.
+    Raises
+    ------
+    TypeError
+        If `ctx` is not a :class:`SlashContext` or :class:`Context`.
+    EmbedNotFoundException
+        If the message is not found.
     """
     if not isinstance(ctx, (SlashContext, commands.Context)):
         raise TypeError(
@@ -141,12 +175,48 @@ async def remove_react_role_command(bot: Licence, ctx: Union[SlashContext, comma
 
     message_specified: discord.Message = await channel.fetch_message(message_id)
 
-
-    print(message_specified.reactions)
-
-    reaction = await util.remove_role_from_reaction(bot, ctx, message_specified, channel, emoji)
-    print("la1")
+    reaction = await util.remove_role_from_reaction(bot, ctx, message_specified, message_id, emoji)
     await bot.delete_role(ctx.guild.id, message_specified.id, channel.id, reaction)
 
-    print(ctx.guild.id, message_specified.id, channel.id, reaction, "la2")
+    embed = util.get_embed(message_specified)
+    splited_description = embed.description.split("\n")
+    new_description = ""
+    if len(splited_description):
+        for d in splited_description:
+            if d.startswith(str(reaction)):
+                continue
+            new_description += d + "\n"
+        embed.description = new_description if len(new_description) else embed.description
+    else:
+        embed.description = ""
 
+
+    await message_specified.edit(embed=embed)
+    await ctx.message.delete()
+
+async def remove_embed(bot: Licence, ctx: Union[SlashContext, commands.Context], message_id: int):
+    r"""
+    Parameters
+    ----------
+    `bot` :Licence
+        The bot's licence.
+    `ctx` :Union[SlashContext, commands.Context]
+        The context in which the command was used.
+    `message_id` : str
+        The message id.
+    Raises
+    ------
+    TypeError
+        If `ctx` is not a :class:`SlashContext` or :class:`Context`.
+    EmbedNotFoundException
+        If the message is not found.
+    """
+    if not isinstance(ctx, (SlashContext, commands.Context)):
+        raise TypeError(
+            f"Expected a {SlashContext.__name__} or {commands.Context.__name__}, got {type(ctx)}.")
+
+    message_specified: discord.Message = await ctx.channel.fetch_message(message_id)
+    embed = util.get_embed(message_specified)
+    await bot.delete_message(message_specified.guild.id, message_id)
+    await message_specified.delete()
+    await ctx.message.delete()
