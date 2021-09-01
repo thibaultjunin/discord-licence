@@ -49,6 +49,12 @@ class Commands(commands.Cog):
     async def _remove_embed(self, ctx: commands.Context, channel: discord.TextChannel, message_id: str):
         await botCommands.remove_embed_command(self.bot, ctx, channel, int(message_id))
 
+    @commands.command(name="help")
+    @commands.has_permissions(administrator=True)
+    @commands.guild_only()
+    async def _help(self, ctx: commands.Context):
+        await botCommands.help_command(self.bot, ctx)
+
 
 def setup(bot):
     bot.add_cog(Commands(bot))
