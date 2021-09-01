@@ -135,10 +135,12 @@ async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Con
         if reaction in message_specified.reactions:
             return await ctx.send("Cette réaction à déjà été ajouté au message")
         await bot.insert_role(ctx.guild.id, message_specified.id, channel.id, reaction, role.id)
-        if embed.description.startswith("Message id :"):
+        if not isinstance(discord.Embed.Empty, type(embed.description)) and embed.description.startswith("Message id :"):
             embed.description = f"{reaction} - {role_description}"
-        else:
+        elif not isinstance(discord.Embed.Empty, type(embed.description)):
             embed.description = f"{embed.description}\n{reaction} - {role_description}"
+        else:
+            embed.description = f"{reaction} - {role_description}"
         await message_specified.edit(embed=embed)
         await message_specified.add_reaction(reaction)
     except asyncio.TimeoutError:
@@ -181,7 +183,7 @@ async def remove_react_role_command(bot: Licence, ctx: Union[SlashContext, comma
     embed = util.get_embed(message_specified)
     splited_description = embed.description.split("\n")
     new_description = ""
-    if len(splited_description):
+    if len(splited_description) > 1:
         for d in splited_description:
             if d.startswith(str(reaction)):
                 continue
@@ -194,7 +196,7 @@ async def remove_react_role_command(bot: Licence, ctx: Union[SlashContext, comma
     await message_specified.edit(embed=embed)
     await ctx.message.delete()
 
-async def remove_embed(bot: Licence, ctx: Union[SlashContext, commands.Context], message_id: int):
+async def remove_embed_command(bot: Licence, ctx: Union[SlashContext, commands.Context], channel: discord.TextChannel, message_id: int):
     r"""
     Parameters
     ----------
@@ -215,7 +217,7 @@ async def remove_embed(bot: Licence, ctx: Union[SlashContext, commands.Context],
         raise TypeError(
             f"Expected a {SlashContext.__name__} or {commands.Context.__name__}, got {type(ctx)}.")
 
-    message_specified: discord.Message = await ctx.channel.fetch_message(message_id)
+    message_specified: discord.Message = await channel.fetch_message(message_id)
     embed = util.get_embed(message_specified)
     await bot.delete_message(message_specified.guild.id, message_id)
     await message_specified.delete()
