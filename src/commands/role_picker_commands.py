@@ -116,14 +116,8 @@ async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Con
             f"Expected a {SlashContext.__name__} or {commands.Context.__name__}, got {type(ctx)}.")
 
     message_specified: discord.Message = await channel.fetch_message(message_id)
-    embeds = message_specified.embeds
-    if len(embeds):
-        embed = embeds[0]
-    else:
-        embed = None
 
-    if embed is None:
-        raise EmbedNotFoundException("L'embed n'a pas pu être retrouvé")
+    embed = util.get_embed(message_specified)
 
     try:
         message_wait_reaction = await ctx.send("Ajoutez la réaction voulue sous ce message, vous avez 10 minutes pour y réagir.")
