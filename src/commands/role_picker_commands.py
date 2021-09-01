@@ -11,7 +11,6 @@ import src.util as util
 from src.errors import EmbedNotFoundException
 
 
-
 async def embed_command(bot: Licence, ctx: Union[SlashContext, commands.Context], embed_title: str):
     r"""
     Parameters
@@ -48,6 +47,7 @@ async def embed_command(bot: Licence, ctx: Union[SlashContext, commands.Context]
     description = description.format(message.id, message.channel)
     embed.description = description
     await message.edit(embed=embed)
+    await ctx.message.delete()
 
 
 async def embed_update_command(bot: Licence, ctx: Union[SlashContext, commands.Context], update_type: str, channel: discord.TextChannel, message_id: int, content: str):
@@ -70,7 +70,6 @@ async def embed_update_command(bot: Licence, ctx: Union[SlashContext, commands.C
     message: discord.Message = await channel.fetch_message(message_id)
     embed = util.get_embed(message)
 
-
     if update_type == "title":
         embed.set_author(
             name=content,
@@ -87,6 +86,7 @@ async def embed_update_command(bot: Licence, ctx: Union[SlashContext, commands.C
         return await ctx.send("Rien n'a changé")
 
     await message.edit(embed=embed)
+    await ctx.message.delete()
 
 
 async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Context], channel: discord.TextChannel, message_id: int, role: discord.Role, role_description: str):
@@ -188,13 +188,14 @@ async def remove_react_role_command(bot: Licence, ctx: Union[SlashContext, comma
             if d.startswith(str(reaction)):
                 continue
             new_description += d + "\n"
-        embed.description = new_description if len(new_description) else embed.description
+        embed.description = new_description if len(
+            new_description) else embed.description
     else:
         embed.description = ""
 
-
     await message_specified.edit(embed=embed)
     await ctx.message.delete()
+
 
 async def remove_embed_command(bot: Licence, ctx: Union[SlashContext, commands.Context], channel: discord.TextChannel, message_id: int):
     r"""
@@ -218,7 +219,10 @@ async def remove_embed_command(bot: Licence, ctx: Union[SlashContext, commands.C
             f"Expected a {SlashContext.__name__} or {commands.Context.__name__}, got {type(ctx)}.")
 
     message_specified: discord.Message = await channel.fetch_message(message_id)
-    embed = util.get_embed(message_specified)
+
+    for reaction in message_specified.reactions:
+        await util.remove_role_from_reaction(bot, ctx, message_specified, message_id, str(reaction))
+
     await bot.delete_message(message_specified.guild.id, message_id)
     await message_specified.delete()
     await ctx.message.delete()
