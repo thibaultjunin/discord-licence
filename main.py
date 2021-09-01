@@ -122,7 +122,7 @@ class Licence(commands.AutoShardedBot, DB):
 
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         # Log every errors in the on_command_error event
-        logger.error(traceback.format_exception(type(error), error, error.__traceback__), exc_info=True)
+        logger.exception("\n".join(traceback.format_exception(type(error), error, error.__traceback__)))
         if isinstance(error, commands.CommandNotFound):
             return await ctx.send("Cette commande n'existe pas.")
             # Handling Command Not Found Errors
