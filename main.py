@@ -42,6 +42,7 @@ class Licence(commands.AutoShardedBot, DB):
             sync_on_cog_reload=True
         )
         super(DB, self).__init__()
+        self.remove_command("help")
         self._color = 0x007fa3
         self._footer_text = "Licence Informatique@UCA"
         self._icon_url = "https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png"
