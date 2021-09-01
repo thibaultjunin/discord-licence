@@ -136,7 +136,6 @@ class Licence(commands.AutoShardedBot, DB):
     #     await ctx.send(embed=embed)
 
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        print(payload)
         guild = await self.fetch_guild(payload.guild_id)
         user: discord.Member = await guild.fetch_member(payload.user_id)
         if user.bot:
@@ -156,7 +155,6 @@ class Licence(commands.AutoShardedBot, DB):
         logger.info(f"Le role {role.name} a été ajouté de l'utilisateur {user}")
 
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
-        print(payload)
         guild = await self.fetch_guild(payload.guild_id)
         user: discord.Member = await guild.fetch_member(payload.user_id)
         if user.bot:

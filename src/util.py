@@ -21,7 +21,6 @@ def get_embed(message: discord.Message):
 
 async def remove_role_from_reaction(bot: Licence, ctx: commands.Context, message: discord.Message, message_id: int, emoji: str):
     for reaction in message.reactions:
-        print(reaction.custom_emoji, str(reaction) == emoji)
         if str(reaction) == emoji:
             if reaction.custom_emoji:
                 role_id = await bot.get_role_id(ctx.guild.id, reaction.emoji.id, message_id)
