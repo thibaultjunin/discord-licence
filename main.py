@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_slash import SlashCommand
-
+import traceback
 import logging
 import sys
 import os
@@ -120,20 +120,21 @@ class Licence(commands.AutoShardedBot, DB):
     def icon_url(self):
         return self._icon_url
 
-    # async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
-    #     logger.error(error, exc_info=True)
-    #     if isinstance(error, commands.CommandNotFound):
-    #         return await ctx.send("Cette commande n'existe pas.")
-    #         # Handling Command Not Found Errors
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
+        # Log every errors in the on_command_error event
+        logger.error(traceback.format_exception(type(error), error, error.__traceback__), exc_info=True)
+        if isinstance(error, commands.CommandNotFound):
+            return await ctx.send("Cette commande n'existe pas.")
+            # Handling Command Not Found Errors
 
-    #     # raise error
-    #     embed = discord.Embed(
-    #         title="Error",
-    #         description=error,
-    #         timestamp=dt.datetime.utcnow(),
-    #         color=self.color
-    #     )
-    #     await ctx.send(embed=embed)
+        # raise error
+        embed = discord.Embed(
+            title="Error",
+            description=error,
+            timestamp=dt.datetime.utcnow(),
+            color=self.color
+        )
+        await ctx.send(embed=embed)
 
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         guild = await self.fetch_guild(payload.guild_id)
@@ -152,7 +153,8 @@ class Licence(commands.AutoShardedBot, DB):
         if role in user.roles:
             return
         await user.add_roles(role)
-        logger.info(f"Le role {role.name} a été ajouté de l'utilisateur {user}")
+        logger.info(
+            f"Le role {role.name} a été ajouté de l'utilisateur {user}")
 
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
         guild = await self.fetch_guild(payload.guild_id)
@@ -169,7 +171,8 @@ class Licence(commands.AutoShardedBot, DB):
         role: discord.Role = guild.get_role(role_id)
 
         await user.remove_roles(role)
-        logger.info(f"Le role {role.name} a été supprimé de l'utilisateur {user}")
+        logger.info(
+            f"Le role {role.name} a été supprimé de l'utilisateur {user}")
 
 
 if __name__ == "__main__":
