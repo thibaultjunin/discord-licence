@@ -130,11 +130,8 @@ async def react_role_command(bot: Licence, ctx: Union[SlashContext, commands.Con
             return await ctx.send("Cette réaction à déjà été ajouté au message")
         await bot.insert_role(ctx.guild.id, message_specified.id, channel.id, reaction, role.id)
         if not isinstance(discord.Embed.Empty, type(embed.description)) and embed.description.startswith("Message id :"):
-            embed.description = f"{reaction} - {role_description}"
-        elif not isinstance(discord.Embed.Empty, type(embed.description)):
-            embed.description = f"{embed.description}\n{reaction} - {role_description}"
-        else:
-            embed.description = f"{reaction} - {role_description}"
+            embed.description = f"Cliquez sur les réactions pour obtenir les rôles correspondants."
+        embed.add_field(name=role_description, value=f"Cliquez sur {reaction}", inline=False)
         await message_specified.edit(embed=embed)
         await message_specified.add_reaction(reaction)
     except asyncio.TimeoutError:
@@ -175,17 +172,25 @@ async def remove_react_role_command(bot: Licence, ctx: Union[SlashContext, comma
     await bot.delete_role(ctx.guild.id, message_specified.id, channel.id, reaction)
 
     embed = util.get_embed(message_specified)
-    splited_description = embed.description.split("\n")
-    new_description = ""
-    if len(splited_description) > 1:
-        for d in splited_description:
-            if d.startswith(str(reaction)):
-                continue
-            new_description += d + "\n"
-        embed.description = new_description if len(
-            new_description) else embed.description
-    else:
-        embed.description = ""
+    for i, field in enumerate(embed.fields):
+        print(field.name, i)
+        if field.value.startswith(f"Cliquez sur {reaction}"):
+            embed.remove_field(i)
+            break
+
+    if not len(embed.fields):
+        embed.description = "Message id : `{0}`\n\nEn attente d'ajout de réactions avec la commande\n`ucareact_role #{1} {0} @role Description` <a:loading:880061819002171432>".format(message_specified.id, message_specified.channel)
+    # splited_description = embed.description.split("\n")
+    # new_description = ""
+    # if len(splited_description) > 1:
+    #     for d in splited_description:
+    #         if d.startswith(str(reaction)):
+    #             continue
+    #         new_description += d + "\n"
+    #     embed.description = new_description if len(
+    #         new_description) else embed.description
+    # else:
+    #     embed.description = ""
 
     await message_specified.edit(embed=embed)
     await ctx.message.delete()
