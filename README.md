@@ -1,3 +1,5 @@
+> **The group of people who originally created this bot are no longer undergraduates, and for some no longer at University Côte d'Azur. That's why we need you to maintain this bot and make sure it keeps working for years to come. We count on you.**
+
 # Licence Informatique@UCA Discord Bot 🥳
 
 <img src="https://usercontent.stantabcorp.com/~thibault/46d34e1eccb244ceabd468f3d597e853-logo-rond-l.png" align="right" alt="Licence Informatique@UCA Discord Bot" width="200" height="200">
@@ -8,33 +10,20 @@ Feel free to fork this project change whatever you want 😉 And don't forget to
 
 ## Features
 
-- Role management
-Use the `!picker` command to create a Role picker and let students select with subjects they are taking
+
 - Channel management
-Use the `!cours` command to create a new category with:
+Use the `/cours` command to create a new category with:
     1. An announcement channel
     2. A general text channel
     3. A general voice channel
 
     This command also creates a new Role to add to the role picker.
 
-- Student management
-*This is a special feature what will only work for our University if you can implement a general verification system you are more than welcome*
-The command `!verification` lets you verify that a student is really who he claims, by asking his student id and checking it against the university's database.
-- Moderation
-The `!warn` command lets you give a warning to someone ~~and the `!mute` allow you to mute them~~.
-- Logging
-The bot will record every activity made on the server such as:
-    1. Messages sent
-    2. Messages edited
-    3. Nickname changes
-
-- Cosmetics
-This bot will automatically change the server's icon and it's avatar every day at midnight.
+**Other features are yet to be implemented**
 
 ## How to run
 
-1. Install dependencies with `npm i`
-1. Copy the `.env.example` to `.env` and fill the appropriatre values
-1. Run `uca.js` via `nodejs uca.js` (or pm2)
+1. Install dependencies with `python3 -m pip install -r requirements.txt`
+1. Copy the `.env.example` to `.env` and fill in the appropriate values
+1. Run `main.py`
 

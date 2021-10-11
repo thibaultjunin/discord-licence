@@ -1,0 +1,5 @@
+python-dotenv
+discord.py
+discord-py-slash-command
+aiomysql
+sqlalchemy
