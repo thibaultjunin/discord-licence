@@ -142,15 +142,18 @@ class Licence(commands.AutoShardedBot, DB):
                     for reaction in reactions:
                         users = await reaction.users().flatten()
                         for user in users:
-                            print(f"trying users {user}")
-                            print(users_roles_deleted)
-                            if not user in users_roles_deleted:
-                                print("in if")
-                                await user.remove_roles(guild.roles)
-                                users_roles_deleted.append(user)
+                            if not user == self.user and user not in users_roles_deleted:
+                                roles_user = user.roles
+                                roles = []
+                                for role in roles_user:
+                                    if not role.permissions.administrator and role.name != '@everyone':
+                                        roles.append(role)
+                                await user.remove_roles(*roles)
+                                users_roles_deleted.append(str(user))
                                 logger.info(f"remove all roles of {user}")
                 except:
                     pass
+                    
 
             for r in row:
                 message_id = r['message_id']
