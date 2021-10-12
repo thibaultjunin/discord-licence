@@ -1,6 +1,6 @@
 CC=python3.9
 
-all:
+all: install
 	$(CC) main.py
 install:
 	$(CC) -m pip install -r requirements.txt
