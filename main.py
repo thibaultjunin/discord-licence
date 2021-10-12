@@ -1,4 +1,5 @@
 import discord
+from discord import message
 from discord.ext import commands
 from discord_slash import SlashCommand
 import traceback
@@ -110,7 +111,10 @@ class Licence(commands.AutoShardedBot, DB):
             activity=None,
             status=discord.Status.online
         )
+        await self.set_up_role_on_start()
         logger.info("Licence ready")
+
+
 
     @property
     def footer_text(self):
@@ -119,6 +123,29 @@ class Licence(commands.AutoShardedBot, DB):
     @property
     def icon_url(self):
         return self._icon_url
+
+    async def set_up_role_on_start(self):
+        guilds = self.guilds
+        for guild in guilds:
+            guild: discord.Guild
+            row = await self.get_all_by_guild(guild.id)
+            for r in row:
+                message_id = r['message_id']
+                channel_id = r['channel_id']
+                role_id = r['role_id']
+                channel: discord.TextChannel = guild.get_channel(channel_id)
+                try:
+                    message: discord.Message = await channel.fetch_message(message_id)
+                    reactions = message.reactions
+                    for reaction in reactions:
+                        users = await reaction.users().flatten()
+                        for user in users:
+                            user: discord.Member
+                            role: discord.Role = guild.get_role(role_id)
+                            await user.add_roles(role)
+                except:
+                    pass
+                
 
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         # Log every errors in the on_command_error event
