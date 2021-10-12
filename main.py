@@ -123,18 +123,18 @@ class Licence(commands.AutoShardedBot, DB):
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         # Log every errors in the on_command_error event
         logger.exception("\n".join(traceback.format_exception(type(error), error, error.__traceback__)))
-        if isinstance(error, commands.CommandNotFound):
-            return await ctx.send("Cette commande n'existe pas.")
+        # if isinstance(error, commands.CommandNotFound):
+        #     return await ctx.send("Cette commande n'existe pas.")
             # Handling Command Not Found Errors
 
         # raise error
-        embed = discord.Embed(
-            title="Error",
-            description=error,
-            timestamp=dt.datetime.utcnow(),
-            color=self.color
-        )
-        await ctx.send(embed=embed)
+        # embed = discord.Embed(
+        #     title="Error",
+        #     description=error,
+        #     timestamp=dt.datetime.utcnow(),
+        #     color=self.color
+        # )
+        # await ctx.send(embed=embed)
 
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         guild = await self.fetch_guild(payload.guild_id)

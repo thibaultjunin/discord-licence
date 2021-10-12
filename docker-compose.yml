@@ -1,0 +1,7 @@
+version: "3.3"
+
+services:
+    bot:
+        image: discord-licence
+        build: .
+        command: python main.py
