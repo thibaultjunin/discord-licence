@@ -129,23 +129,47 @@ class Licence(commands.AutoShardedBot, DB):
         for guild in guilds:
             guild: discord.Guild
             row = await self.get_all_by_guild(guild.id)
+
+            users_roles_deleted = []
             for r in row:
                 message_id = r['message_id']
                 channel_id = r['channel_id']
-                role_id = r['role_id']
                 channel: discord.TextChannel = guild.get_channel(channel_id)
                 try:
                     message: discord.Message = await channel.fetch_message(message_id)
                     reactions = message.reactions
+
                     for reaction in reactions:
                         users = await reaction.users().flatten()
                         for user in users:
+                            print(f"trying users {user}")
+                            print(users_roles_deleted)
+                            if not user in users_roles_deleted:
+                                print("in if")
+                                await user.remove_roles(guild.roles)
+                                users_roles_deleted.append(user)
+                                logger.info(f"remove all roles of {user}")
+                except:
+                    pass
 
+            for r in row:
+                message_id = r['message_id']
+                channel_id = r['channel_id']
+                channel: discord.TextChannel = guild.get_channel(channel_id)
+                try:
+                    message: discord.Message = await channel.fetch_message(message_id)
+                    reactions = message.reactions
+
+                    for reaction in reactions:
+                        users = await reaction.users().flatten()
+                        for user in users:
+                            role_id = self.get_role_id_by_emoji_name(reaction.emoji)
+                            print('role_id', role_id)
                             user: discord.Member
                             role: discord.Role = guild.get_role(role_id)
                             if not role in user.roles:
                                 await user.add_roles(role)
-                                logger.info(f"add role {role}")
+                                logger.info(f"add role {role} to {user}")
                 except:
                     pass
 
