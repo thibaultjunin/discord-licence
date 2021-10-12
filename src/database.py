@@ -52,6 +52,12 @@ class DB:
             row = await result.fetchone()
             return row['guild_id']
 
+    async def get_all_by_guild(self, guild_id):
+        async with self.engine.acquire() as conn:
+            result = await conn.execute(self.rpicker_tbl.select().where(self.rpicker_tbl.c.guild_id == guild_id))
+            row = await result.fetchall()
+            return row
+
     async def get_channel_id(self, message_id):
         async with self.engine.acquire() as conn:
             result = await conn.execute(self.rpicker_tbl.select().where(self.rpicker_tbl.c.message_id == message_id))
