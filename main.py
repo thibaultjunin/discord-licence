@@ -129,10 +129,34 @@ class Licence(commands.AutoShardedBot, DB):
         for guild in guilds:
             guild: discord.Guild
             row = await self.get_all_by_guild(guild.id)
+
+            users_roles_deleted = []
             for r in row:
                 message_id = r['message_id']
                 channel_id = r['channel_id']
-                role_id = r['role_id']
+                channel: discord.TextChannel = guild.get_channel(channel_id)
+                try:
+                    message: discord.Message = await channel.fetch_message(message_id)
+                    reactions = message.reactions
+
+                    for reaction in reactions:
+                        users = await reaction.users().flatten()
+                        for user in users:
+                            if not user == self.user and user not in users_roles_deleted:
+                                roles_user = user.roles
+                                roles = []
+                                for role in roles_user:
+                                    if not role.permissions.administrator and role.name != '@everyone':
+                                        roles.append(role)
+                                await user.remove_roles(*roles)
+                                users_roles_deleted.append(user)
+                                logger.info(f"remove all roles of {user}")
+                except Exception as e:
+                    logger.exception("\n".join(traceback.format_exception(type(e), e, e.__traceback__)))
+                    
+            for r in row:
+                message_id = r['message_id']
+                channel_id = r['channel_id']
                 channel: discord.TextChannel = guild.get_channel(channel_id)
                 try:
                     message: discord.Message = await channel.fetch_message(message_id)
@@ -140,14 +164,15 @@ class Licence(commands.AutoShardedBot, DB):
                     for reaction in reactions:
                         users = await reaction.users().flatten()
                         for user in users:
-
-                            user: discord.Member
-                            role: discord.Role = guild.get_role(role_id)
-                            if not role in user.roles:
-                                await user.add_roles(role)
-                                logger.info(f"add role {role}")
-                except:
-                    pass
+                            if user != self.user:
+                                role_id = await self.get_role_id_by_emoji_name(guild.id, reaction.emoji, message_id)
+                                user: discord.Member
+                                role: discord.Role = guild.get_role(role_id)
+                                if not role in user.roles:
+                                    await user.add_roles(role)
+                                    logger.info(f"add role {role} to {user}")
+                except Exception as e:
+                    logger.exception("\n".join(traceback.format_exception(type(e), e, e.__traceback__)))
 
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         # Log every errors in the on_command_error event
