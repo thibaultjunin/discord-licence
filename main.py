@@ -140,12 +140,14 @@ class Licence(commands.AutoShardedBot, DB):
                     for reaction in reactions:
                         users = await reaction.users().flatten()
                         for user in users:
+
                             user: discord.Member
                             role: discord.Role = guild.get_role(role_id)
-                            await user.add_roles(role)
+                            if not role in user.roles:
+                                await user.add_roles(role)
+                                logger.info(f"add role {role}")
                 except:
                     pass
-                
 
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         # Log every errors in the on_command_error event
